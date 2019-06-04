@@ -4,8 +4,7 @@
 
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
-| | | |
-| | | |
+|Jagmandeep Kaur | | |  | | |
 | | | |
 | | | |
 
