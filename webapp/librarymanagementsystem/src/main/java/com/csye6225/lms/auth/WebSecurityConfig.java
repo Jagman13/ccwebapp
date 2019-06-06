@@ -25,12 +25,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
                 .disable()
-                .authorizeRequests()
+                .authorizeRequests().antMatchers("/user/register").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -38,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+}
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)

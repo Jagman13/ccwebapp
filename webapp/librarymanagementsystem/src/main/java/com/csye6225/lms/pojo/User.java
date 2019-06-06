@@ -7,7 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
+import com.csye6225.lms.validation.PasswordConstraint;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -19,8 +21,10 @@ public class User {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
-
+    @Email(message="Email not valid")
     private String email;
+
+    @PasswordConstraint(message="Invalid Password")
     private String password;
 
     public User() {
