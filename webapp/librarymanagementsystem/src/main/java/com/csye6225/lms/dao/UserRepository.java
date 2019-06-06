@@ -9,6 +9,6 @@ import com.csye6225.lms.pojo.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID>{
-
     User findByEmail(String email);
+    User saveAndFlush(User user);
 }
