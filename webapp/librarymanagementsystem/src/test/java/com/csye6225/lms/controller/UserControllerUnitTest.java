@@ -32,7 +32,8 @@ public class UserControllerUnitTest {
 
     @Test
     public void testRegisterPath() throws Exception {
-        when(userRepository.findByEmail(anyString())).thenReturn(null);
+
+
         // simulate the form submit (POST)
         User userDetails = new User();
         userDetails.setEmail("honraoa@yahoo.com");
