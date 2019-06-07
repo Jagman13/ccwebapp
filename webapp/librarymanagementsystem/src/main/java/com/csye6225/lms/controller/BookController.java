@@ -47,7 +47,7 @@ public class BookController {
         newBook.setId(null);
         Book book = bookService.save(newBook);
         if (book == null) {
-            return ResponseEntity.noContent().build();
+            throw new ResourceNotFoundException("Can not be saved due to server issue");
         }
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
