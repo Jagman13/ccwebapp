@@ -27,6 +27,8 @@ public class Book {
     @Column(nullable = false)
     private int quantity;
 
+
+
     public UUID getId() {
         return id;
     }
