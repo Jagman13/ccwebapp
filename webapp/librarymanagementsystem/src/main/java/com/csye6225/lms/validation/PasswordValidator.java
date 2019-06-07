@@ -18,7 +18,8 @@ public class PasswordValidator implements ConstraintValidator<PasswordConstraint
     public boolean isValid(final String password, final ConstraintValidatorContext context) {
 
         final org.passay.PasswordValidator validator = new org.passay.PasswordValidator(Arrays.asList(
-                        new UppercaseCharacterRule(1),
+                    new LengthRule(8,12),
+                new UppercaseCharacterRule(1),
                         new DigitCharacterRule(1),
                         new SpecialCharacterRule(1),
                         new NumericalSequenceRule(3,false),
