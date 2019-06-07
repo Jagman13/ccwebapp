@@ -24,9 +24,19 @@ public class Book {
     @Column(nullable = false)
     private String isbn;
 
+    public Book(String title, String author, String isbn, int quantity) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.quantity = quantity;
+    }
+
     @Column(nullable = false)
     private int quantity;
 
+    public Book(){
+
+    }
 
 
     public UUID getId() {

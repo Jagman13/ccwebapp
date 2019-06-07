@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -39,15 +40,14 @@ public class BookControllerUnitTest {
     }
 
     @Test
-    public void testGetBooksSuccess() throws Exception {
+    @WithMockUser(username="honraoakshata@gmail.com",password = "Abcd@123",roles={"USER"})
+    public void testAddBooksSuccess() throws Exception {
         //User does not exist in database
-        List<Book> bookList = new ArrayList<Book>();
-        bookList.add(new Book());
+        //Book book = new Book("Java","Herbert Schildt","1234Ubs",5);
+
         //when(userRepository.findByEmail(userDetails.getEmail())).thenReturn(null);
-        mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).param("email","honraoa@yahoo.com").param("password","Abcd@123"))
-                .andExpect(status().isOk());
+        mockMvc.perform((post("/book").contentType(MediaType.APPLICATION_JSON).param("title", "Java").param("author", "Herbert Schildt").param("isbn","1234Ubs"))
+                .andExpect(status().isOk()));
     }
-
-
 
 }
