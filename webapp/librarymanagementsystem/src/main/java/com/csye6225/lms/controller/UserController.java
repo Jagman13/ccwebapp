@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.csye6225.lms.auth.BcryptPasswordEncoderBean;
 import com.csye6225.lms.dao.UserRepository;
+import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
 import org.apache.http.entity.ContentType;
@@ -67,6 +68,7 @@ public class UserController {
 			jsonObject.addProperty("message", "User already exists");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(gson.toJson(jsonObject));
 		}
-		return ResponseEntity.ok(gson.toJson(jsonObject));
+		return ResponseEntity.status(HttpStatus.CREATED).body(gson.toJson(jsonObject));
+
 	}
 }
