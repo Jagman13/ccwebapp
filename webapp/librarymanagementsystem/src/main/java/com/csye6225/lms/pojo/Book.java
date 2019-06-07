@@ -36,7 +36,15 @@ public class Book {
     @Min(value = 1, message = "quantity must be greater than or equal to 1")
     private int quantity;
 
+    public Book(){}
 
+    public Book(UUID id,String title,  String author,  String isbn, int quantity) {
+        this.id=id;
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.quantity = quantity;
+    }
 
     public UUID getId() {
         return id;

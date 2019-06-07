@@ -1,11 +1,9 @@
 package com.csye6225.lms.controller;
 
-<<<<<<< HEAD
-import com.csye6225.lms.dao.BookRepository;
-=======
+
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.service.BookService;
->>>>>>> 2936565376fef8d60a4a14456caa4b199833d418
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
