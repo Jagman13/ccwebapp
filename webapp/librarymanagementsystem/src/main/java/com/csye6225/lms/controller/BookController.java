@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -43,19 +44,24 @@ public class BookController {
     }
 
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook) throws URISyntaxException {
+    public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
         newBook.setId(null);
         Book book = bookService.save(newBook);
         if (book == null) {
-            throw new ResourceNotFoundException("Can not be saved due to server issue");
+            throw new Exception("Internal Server error");
+
         }
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(book.getId())
                 .toUri();
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
 
-        return ResponseEntity.created(location).build();
+        return new ResponseEntity<Book>(book,headers, HttpStatus.CREATED);
+
+
     }
 
     @PutMapping(value = "/", produces = "application/json", consumes = "application/json")
