@@ -33,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .password(user.getPassword()).roles("USER").build();
     }
 
-    public static boolean validatePassword(final String password)
+    public boolean validatePassword(final String password)
     {
 
         Pattern p = Pattern.compile("((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20})");
