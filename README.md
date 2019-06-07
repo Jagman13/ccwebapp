@@ -5,7 +5,7 @@
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
 |Jagmandeep Kaur | | |  | | |
-| | | |
+|Yogita Patil| | |
 | | | |
 
 ## Technology Stack
