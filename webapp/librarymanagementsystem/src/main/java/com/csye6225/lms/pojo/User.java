@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 
 import com.csye6225.lms.validation.PasswordConstraint;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "user")
@@ -21,7 +22,8 @@ public class User {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "BINARY(16)")
+    @Type(type = "uuid-char")
+    @Column(nullable = false, length = 36, unique = true)
     private UUID id;
 
     @Email(message="Email not valid")

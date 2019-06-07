@@ -1,9 +1,13 @@
 package com.csye6225.lms.pojo;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
 import java.util.UUID;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="book")
@@ -12,31 +16,25 @@ public class Book {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(nullable = false)
+    @Type(type = "uuid-char")
+    @Column(nullable = false, length = 36, unique = true)
     private UUID id ;
 
     @Column(nullable = false)
+    @NotBlank(message = "title cannot be blank")
     private String title;
 
     @Column(nullable = false)
+    @NotBlank(message = "author cannot be blank")
     private String author;
 
     @Column(nullable = false)
+    @NotBlank(message = "isbn cannot be blank")
     private String isbn;
 
-    public Book(String title, String author, String isbn, int quantity) {
-        this.title = title;
-        this.author = author;
-        this.isbn = isbn;
-        this.quantity = quantity;
-    }
-
     @Column(nullable = false)
+    @Min(value = 1, message = "quantity must be greater than or equal to 1")
     private int quantity;
-
-    public Book(){
-
-    }
 
 
     public UUID getId() {
