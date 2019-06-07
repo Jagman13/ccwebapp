@@ -7,8 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "user")
@@ -17,10 +22,19 @@ public class User {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "BINARY(16)")
+    @Type(type = "uuid-char")
+    @Column(nullable = false, length = 36, unique = true)
     private UUID id;
 
+    @Pattern(regexp="^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$",
+            message="Invalid Email")
+    @NotNull(message="Email cannot be null")
+    @NotEmpty(message="Email cannot be empty")
     private String email;
+
+
+    @NotNull(message = "Password cannot be null")
+    @NotEmpty(message = "Password cannot be empty")
     private String password;
 
     public User() {
