@@ -29,6 +29,7 @@ public class UserController {
 	private UserRepository userRepository;
 
 
+
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {
 		Date date = new Date();
@@ -39,20 +40,18 @@ public class UserController {
 
 	@PostMapping(value = "/user/register")
 	public ResponseEntity<String> register(@ModelAttribute User user) {
-		String email=user.getEmail();
-		String password=user.getPassword();
 		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-		User newuser=userRepository.findByEmail(email);
+		User newuser=userRepository.findByEmail(user.getEmail());
 		JsonObject jsonObject = new JsonObject();
 		if (newuser==null){
 			User usersaved=userRepository.saveAndFlush(user);
 			jsonObject.addProperty("message","You have been registered in system ");
-			jsonObject.addProperty("username",email);
-
+			jsonObject.addProperty("username",user.getEmail());
 		}else if(newuser != null) {
+			jsonObject.addProperty("username",user.getEmail());
 			jsonObject.addProperty("message", "User already exists");
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(gson.toJson(jsonObject));
 		}
 		return ResponseEntity.ok(gson.toJson(jsonObject));
 	}
-
 }
