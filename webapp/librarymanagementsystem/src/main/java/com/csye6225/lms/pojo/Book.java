@@ -37,6 +37,7 @@ public class Book {
     private int quantity;
 
 
+
     public UUID getId() {
         return id;
     }

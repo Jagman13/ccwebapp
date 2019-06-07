@@ -1,11 +1,11 @@
 package com.csye6225.lms.service;
 
-import com.google.gson.JsonObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import com.csye6225.lms.dao.UserRepository;
@@ -33,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .password(user.getPassword()).roles("USER").build();
     }
 
-    public static boolean validatePassword(final String password)
+    public boolean validatePassword(final String password)
     {
 
         Pattern p = Pattern.compile("((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20})");
