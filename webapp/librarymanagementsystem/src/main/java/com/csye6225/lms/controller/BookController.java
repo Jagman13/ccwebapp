@@ -27,7 +27,6 @@ public class BookController {
             return ResponseEntity.noContent().build();
         }
 
-
         return ResponseEntity.ok(book);
 
 

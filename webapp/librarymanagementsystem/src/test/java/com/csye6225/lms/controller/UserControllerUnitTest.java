@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc //need this in Spring Boot test
 public class UserControllerUnitTest {
@@ -60,4 +60,5 @@ public class UserControllerUnitTest {
         mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).param("email","honraoa@yahoo.com").param("password","Abcd@123"))
                 .andExpect(status().isConflict());
     }
+
 }
