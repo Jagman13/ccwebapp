@@ -36,6 +36,10 @@ public class Book {
     @Min(value = 1, message = "quantity must be greater than or equal to 1")
     private int quantity;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name ="img_id")
+    private Image imageDetails ;
+
     public Book(){
 
     }
@@ -86,5 +90,13 @@ public class Book {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Image getImageDetails() {
+        return imageDetails;
+    }
+
+    public void setImageDetails(Image imageDetails) {
+        this.imageDetails = imageDetails;
     }
 }
