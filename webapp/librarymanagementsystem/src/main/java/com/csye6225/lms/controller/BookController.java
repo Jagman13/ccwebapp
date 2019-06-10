@@ -1,11 +1,9 @@
 package com.csye6225.lms.controller;
 
-import com.csye6225.lms.dao.BookRepository;
 import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.service.BookService;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -46,7 +44,11 @@ public class BookController {
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
         newBook.setId(null);
-        Book book = bookService.save(newBook);
+        if (newBook.getImageDetails() == null)
+        {
+            throw new ResourceNotFoundException("ImageDetails not found");
+        }
+        Book book = bookService.createBook(newBook);
         if (book == null) {
             throw new Exception("Internal Server error");
 
@@ -74,7 +76,7 @@ public class BookController {
         if (!b.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        bookService.save(book);
+        bookService.createBook(book);
         return ResponseEntity.noContent().build();
     }
 

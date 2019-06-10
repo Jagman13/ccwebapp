@@ -2,6 +2,7 @@ package com.csye6225.lms.service;
 
 import com.csye6225.lms.dao.BookRepository;
 import com.csye6225.lms.pojo.Book;
+import com.csye6225.lms.pojo.Image;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,11 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public Book save(Book book){
-        return bookRepository.save(book);
+    public Book createBook(Book book){
+      return bookRepository.save(book);
     }
+
+
 
     public Optional<Book> findById(UUID id){
         return bookRepository.findById(id);

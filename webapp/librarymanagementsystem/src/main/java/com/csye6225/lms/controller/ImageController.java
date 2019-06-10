@@ -6,6 +6,7 @@ import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.Image;
 import com.csye6225.lms.service.BookService;
+import com.csye6225.lms.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,9 @@ public class ImageController {
     @Autowired
     private BookService bookService;
 
+    @Autowired
+    private ImageService imageService;
+
     @PostMapping(value = "/{id}/image",produces = "application/json", consumes = "application/json")
     public ResponseEntity<Image> saveImage(@PathVariable UUID id , @Valid @RequestBody Image newImg , UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
 
@@ -36,18 +40,16 @@ public class ImageController {
         }
 
         Book b = book.get();
-        b.setImageDetails(newImg);
-        bookService.save(b);
-
+        Image img =imageService.saveImage(newImg , b) ;
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}/image/{img_id}")
-                .buildAndExpand(b.getId() ,b.getImageDetails().getId())
+                .buildAndExpand(b.getId() ,img.getId())
                 .toUri();
         final HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
 
-        return new ResponseEntity<Image>(b.getImageDetails(),headers, HttpStatus.CREATED);
+        return new ResponseEntity<Image>(img,headers, HttpStatus.CREATED);
 
 
     }
