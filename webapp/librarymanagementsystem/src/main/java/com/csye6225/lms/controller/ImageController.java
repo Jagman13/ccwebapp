@@ -39,16 +39,14 @@ public class ImageController {
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");
         }
+
+        if(book.get().getImageDetails()!=null){
+            throw new Exception("Only one image can be added per book");
+        }
+
         Book b = book.get();
         String fileName = file.getOriginalFilename();
         Image image = imageService.saveImage(b,fileName,file);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}/image/{img_id}")
-                .buildAndExpand(b.getId() ,image.getId())
-                .toUri();
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(location);
         return  ResponseEntity.ok(image);
     }
 
@@ -80,4 +78,4 @@ public class ImageController {
         return ResponseEntity.noContent().build();
     }
 
-    }
+}
