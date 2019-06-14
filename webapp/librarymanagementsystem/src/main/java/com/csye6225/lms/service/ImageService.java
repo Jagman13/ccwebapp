@@ -7,6 +7,7 @@ import com.csye6225.lms.pojo.Image;
 import com.csye6225.lms.service.BookService;
 import com.csye6225.lms.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,8 @@ public class ImageService {
 
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = "C://Users//honra//Desktop//Picture Folder//";
+    @Value("${file.local.path}")
+    private String UPLOADED_FOLDER;
 
     public Image saveImage(String fileName , Book b){
         Image  newImg = new Image();

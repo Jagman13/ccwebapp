@@ -44,10 +44,6 @@ public class BookController {
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
         newBook.setId(null);
-        if (newBook.getImageDetails() == null)
-        {
-            throw new ResourceNotFoundException("ImageDetails not found");
-        }
         Book book = bookService.createBook(newBook);
         if (book == null) {
             throw new Exception("Internal Server error");
@@ -62,8 +58,6 @@ public class BookController {
         headers.setLocation(location);
 
         return new ResponseEntity<Book>(book,headers, HttpStatus.CREATED);
-
-
     }
 
     @PutMapping(value = "/", produces = "application/json", consumes = "application/json")
