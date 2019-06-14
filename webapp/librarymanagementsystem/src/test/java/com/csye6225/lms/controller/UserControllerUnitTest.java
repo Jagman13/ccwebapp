@@ -1,5 +1,4 @@
 package com.csye6225.lms.controller;
-
 import com.csye6225.lms.dao.UserRepository;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
@@ -10,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

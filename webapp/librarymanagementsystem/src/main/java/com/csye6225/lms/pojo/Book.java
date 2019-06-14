@@ -44,8 +44,8 @@ public class Book {
 
     }
 
-    public Book(UUID id, String title, String author, String isbn, int quantity) {
-        this.id = id;
+    public Book(UUID id,String title,  String author,  String isbn, int quantity) {
+        this.id=id;
         this.title = title;
         this.author = author;
         this.isbn = isbn;
