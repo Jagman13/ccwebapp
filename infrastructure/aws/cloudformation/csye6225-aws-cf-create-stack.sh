@@ -1,36 +1,44 @@
 #!/bin/sh
 #shell script to create AWS network infrastructures
 
- echo "Enter Stack Name: "
- read STACK_NAME
- echo "Enter Region:"
- read  region
- echo "Enter VPCCidrBlock:"
- read  vpcCidrBlock
- echo "Enter VPCSubnetCidrBlock1:"
- read  subnetCidrBlock1
- echo "Enter VPCSubnetCidrBlock2:"
- read  subnetCidrBlock2
- echo "Enter VPCSubnetCidrBlock3:"
- read  subnetCidrBlock3
+ 
+ help_me()
+{
+	  echo "Usage:-"
+	  echo "$0 <stack name> <region-name> <vpc-cidr-block> <subnet1-cidr-block> <subnet2-cidr-block> <subnet3-cidr-block>"
+	  exit
+}
 
+	STACK_NAME=$1
+	REGION_NAME=$2
+	CIDR_BLOCK=$3
+	SUBNET1_CIDR=$4
+	SUBNET2_CIDR=$5
+	SUBNET3_CIDR=$6
 
-if [ -z "$STACK_NAME" ] || [ -z "$region" ] || [ -z "$vpcCidrBlock" ] || [ -z "$subnetCidrBlock1" ] || [ -z "$subnetCidrBlock2" ] || [ -z "$subnetCidrBlock3" ] ; then
-	echo "Please provide all the values"
-	exit 1
+	destinationCidrBlock="0.0.0.0/0"
+	# CIDR_BLOCK="10.0.0.0/16"
+	# REGION_NAME="us-east-1"
+	# SUBNET1_CIDR="10.0.10.0/24"
+	# SUBNET2_CIDR="10.0.50.0/24"
+	# SUBNET3_CIDR="10.0.60.0/24"
+
+	if [ $# -ne 6 ]
+	then 
+		echo -e "You are missing some parameters"
+		help_me
 fi
-
 
 
 
 echo "Creating stack..."
 aws cloudformation create-stack --stack-name $STACK_NAME --template-body file://csye6225-cf-networking.json \
 --parameters ParameterKey=EnvironmentName,ParameterValue=$STACK_NAME \
- ParameterKey=AvailabilityZone,ParameterValue=$region \
- ParameterKey=VPCCidrBlock,ParameterValue=$vpcCidrBlock \
- ParameterKey=VPCSubnetCidrBlock1,ParameterValue=$subnetCidrBlock1 \
- ParameterKey=VPCSubnetCidrBlock2,ParameterValue=$subnetCidrBlock2 \
- ParameterKey=VPCSubnetCidrBlock3,ParameterValue=$subnetCidrBlock3
+ ParameterKey=AvailabilityZone,ParameterValue=$REGION_NAME \
+ ParameterKey=VPCCidrBlock,ParameterValue=$CIDR_BLOCK \
+ ParameterKey=VPCSubnetCidrBlock1,ParameterValue=$SUBNET1_CIDR \
+ ParameterKey=VPCSubnetCidrBlock2,ParameterValue=$SUBNET2_CIDR \
+ ParameterKey=VPCSubnetCidrBlock3,ParameterValue=$SUBNET3_CIDR
  
 
 if [ $? -eq 0 ]; then

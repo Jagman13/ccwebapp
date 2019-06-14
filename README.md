@@ -4,7 +4,6 @@
 
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
-
 |Jagmandeep Kaur | 001426439|kaur.j@husky.neu.edu |  | | |
 |Akshata Honrao| 001444239| hanrao.a@husky.neu.edu|
 |Yogita Patil| 001435442|patil.yo@husky.neu.edu |
@@ -56,6 +55,14 @@ GET |	/book/{id} |	Yes |	Get a books
 DELETE 	|/book/{id} |	Yes |	Delete a book
 
 PUT 	|/book |	Yes 	|Update book information
+
+POST 	|/book/{idBook}/image |	Yes 	|Attach a image to the book
+
+GET 	|/book/{idBook}/image/ |	Yes 	|Get book image 
+
+PUT 	|/book/{idBook}/image/{idImage} |	Yes 	|Update image attached to the book
+
+DELETE 	|/book/{idBook}/image/{idImage} |	Yes 	|Delete file attached to the book
 
 
 Unit tests can be run directly from IntelliJ
