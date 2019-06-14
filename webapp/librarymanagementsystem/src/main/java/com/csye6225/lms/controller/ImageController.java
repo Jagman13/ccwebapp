@@ -62,6 +62,7 @@ public class ImageController {
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
         imageService.DeleteImage(book.get());
+        imageService.deleteImage(book.get().getImageDetails().getId(),book.get());
         return ResponseEntity.noContent().build();
     }
 
@@ -74,7 +75,7 @@ public class ImageController {
         imageService.DeleteImage(book.get());
         String fileNameNew = file.getOriginalFilename();
         //Adding new image to the location
-        Image image =imageService.saveImage(book.get(),fileNameNew,file);
+        Image image =imageService.updateImage(fileNameNew,book.get(),file,idImage);
         return ResponseEntity.noContent().build();
     }
 

@@ -74,6 +74,10 @@ public class BookController {
         if (!b.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
+        if(null!=b.get().getImageDetails())
+        {
+            book.setImageDetails(b.get().getImageDetails());
+        }
         bookService.createBook(book);
         return ResponseEntity.noContent().build();
     }

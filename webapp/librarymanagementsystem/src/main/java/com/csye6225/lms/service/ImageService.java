@@ -91,10 +91,17 @@ public class ImageService {
         {
             throw new Exception("Invalid permissions.  ");
         }
-        deleteImage(book.getImageDetails().getId(),book);
+
     }
 
-    public Image saveImage(Book book, String fileNameNew, MultipartFile file) throws Exception {
+    public Image saveImage(Book book, String fileNameNew ,MultipartFile file) throws Exception {
+        String destinationFilePath = checkExtension(book,fileNameNew,file);
+        Image img = saveImage(destinationFilePath , book) ;
+        return img;
+    }
+
+
+    public String checkExtension (Book book, String fileNameNew, MultipartFile file) throws Exception{
         String fileExtension="";
         if(fileNameNew.contains(".") && fileNameNew.lastIndexOf(".")!= 0)
         {
@@ -112,8 +119,19 @@ public class ImageService {
             e.printStackTrace();
             throw new Exception("File cannot be saved");
         }
-        Image img = saveImage(destinationFilePath , book) ;
-        return img;
+
+        return destinationFilePath;
+    }
+
+
+    public Image updateImage(String fileName , Book b, MultipartFile file ,UUID imageId) throws  Exception{
+        String newFilePath = checkExtension(b,fileName,file) ;
+
+        Optional<Image>  img = imgRepository.findById(imageId);
+        img.get().setUrl(newFilePath);
+        b.setImageDetails(img.get());
+        b =bookService.createBook(b);
+        return b.getImageDetails();
     }
 
 }
