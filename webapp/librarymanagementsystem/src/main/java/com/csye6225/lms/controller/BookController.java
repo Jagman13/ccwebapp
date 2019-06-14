@@ -4,6 +4,7 @@ import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.service.BookService;
+import com.csye6225.lms.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
@@ -75,11 +79,17 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteBook(@PathVariable UUID id) {
+    public ResponseEntity<Object> deleteBook(@PathVariable UUID id) throws Exception{
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");
         }
+
+        Book b = book.get();
+        if(b.getImageDetails()!=null){
+            imageService.DeleteImage(b);
+        }
+
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
