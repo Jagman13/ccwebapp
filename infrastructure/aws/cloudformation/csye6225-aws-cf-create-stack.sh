@@ -1,25 +1,33 @@
 #!/bin/sh
 #shell script to create AWS network infrastructures
 
- echo "Enter Stack Name: "
- read STACK_NAME
- echo "Enter Region:"
- read  region
- echo "Enter VPCCidrBlock:"
- read  vpcCidrBlock
- echo "Enter VPCSubnetCidrBlock1:"
- read  subnetCidrBlock1
- echo "Enter VPCSubnetCidrBlock2:"
- read  subnetCidrBlock2
- echo "Enter VPCSubnetCidrBlock3:"
- read  subnetCidrBlock3
+ 
+ help_me()
+{
+	  echo "Usage:-"
+	  echo "$0 <stack name> <region-name> <vpc-cidr-block> <subnet1-cidr-block> <subnet2-cidr-block> <subnet3-cidr-block>"
+	  exit
+}
 
+	STACK_NAME=$1
+	REGION_NAME=$2
+	CIDR_BLOCK=$3
+	SUBNET1_CIDR=$4
+	SUBNET2_CIDR=$5
+	SUBNET3_CIDR=$6
 
-if [ -z "$STACK_NAME" ] || [ -z "$region" ] || [ -z "$vpcCidrBlock" ] || [ -z "$subnetCidrBlock1" ] || [ -z "$subnetCidrBlock2" ] || [ -z "$subnetCidrBlock3" ] ; then
-	echo "Please provide all the values"
-	exit 1
+	destinationCidrBlock="0.0.0.0/0"
+	# CIDR_BLOCK="10.0.0.0/16"
+	# REGION_NAME="us-east-1"
+	# SUBNET1_CIDR="10.0.10.0/24"
+	# SUBNET2_CIDR="10.0.50.0/24"
+	# SUBNET3_CIDR="10.0.60.0/24"
+
+	if [ $# -ne 6 ]
+	then 
+		echo -e "You are missing some parameters"
+		help_me
 fi
-
 
 
 
