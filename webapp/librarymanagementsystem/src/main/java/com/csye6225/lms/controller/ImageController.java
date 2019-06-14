@@ -1,4 +1,5 @@
 package com.csye6225.lms.controller;
+import org.springframework.web.multipart.MultipartFile;
 
 
 
@@ -9,13 +10,13 @@ import com.csye6225.lms.service.BookService;
 import com.csye6225.lms.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -31,27 +32,52 @@ public class ImageController {
     @Autowired
     private ImageService imageService;
 
-    @PostMapping(value = "/{id}/image",produces = "application/json", consumes = "application/json")
-    public ResponseEntity<Image> saveImage(@PathVariable UUID id , @Valid @RequestBody Image newImg , UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
-
+    @PostMapping(value = "/{id}/image")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public ResponseEntity<Image> saveImage(@PathVariable UUID id , @RequestPart("url") MultipartFile file, UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");
         }
-
         Book b = book.get();
-        Image img =imageService.saveImage(newImg , b) ;
+        String fileName = file.getOriginalFilename();
+        Image image = imageService.saveImage(b,fileName,file);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}/image/{img_id}")
-                .buildAndExpand(b.getId() ,img.getId())
+                .buildAndExpand(b.getId() ,image.getId())
                 .toUri();
         final HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
+        return  ResponseEntity.ok(image);
+    }
 
-        return new ResponseEntity<Image>(img,headers, HttpStatus.CREATED);
+    @GetMapping(value = "/{idBook}/image/{idImage}")
+    public ResponseEntity<Image> getImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) {
+        imageService.checkBookImageMapping(idBook,idImage);
+        Optional<Image> image = imageService.getImage(idImage);
+        return ResponseEntity.ok(image.get());
+    }
 
+    @DeleteMapping(value = "/{idBook}/image/{idImage}")
+    public ResponseEntity<Object> deleteImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) throws Exception {
+        imageService.checkBookImageMapping(idBook,idImage);
+        Optional<Book> book = bookService.findById(idBook);
+        imageService.DeleteImage(book.get());
+        return ResponseEntity.noContent().build();
+    }
 
+    @PutMapping(value = "/{idBook}/image/{idImage}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public ResponseEntity<Object> putImage(@PathVariable UUID idBook ,@PathVariable UUID idImage,@RequestPart("url") MultipartFile file) throws Exception {
+        imageService.checkBookImageMapping(idBook,idImage);
+        Optional<Book> book = bookService.findById(idBook);
+        //Deleting the image from location
+        imageService.DeleteImage(book.get());
+        String fileNameNew = file.getOriginalFilename();
+        //Adding new image to the location
+        Image image =imageService.saveImage(book.get(),fileNameNew,file);
+        return ResponseEntity.noContent().build();
     }
 
     }
