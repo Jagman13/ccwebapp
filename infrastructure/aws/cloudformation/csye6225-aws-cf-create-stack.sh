@@ -34,11 +34,11 @@ fi
 echo "Creating stack..."
 aws cloudformation create-stack --stack-name $STACK_NAME --template-body file://csye6225-cf-networking.json \
 --parameters ParameterKey=EnvironmentName,ParameterValue=$STACK_NAME \
- ParameterKey=AvailabilityZone,ParameterValue=$region \
- ParameterKey=VPCCidrBlock,ParameterValue=$vpcCidrBlock \
- ParameterKey=VPCSubnetCidrBlock1,ParameterValue=$subnetCidrBlock1 \
- ParameterKey=VPCSubnetCidrBlock2,ParameterValue=$subnetCidrBlock2 \
- ParameterKey=VPCSubnetCidrBlock3,ParameterValue=$subnetCidrBlock3
+ ParameterKey=AvailabilityZone,ParameterValue=$REGION_NAME \
+ ParameterKey=VPCCidrBlock,ParameterValue=$CIDR_BLOCK \
+ ParameterKey=VPCSubnetCidrBlock1,ParameterValue=$SUBNET1_CIDR \
+ ParameterKey=VPCSubnetCidrBlock2,ParameterValue=$SUBNET2_CIDR \
+ ParameterKey=VPCSubnetCidrBlock3,ParameterValue=$SUBNET3_CIDR
  
 
 if [ $? -eq 0 ]; then
