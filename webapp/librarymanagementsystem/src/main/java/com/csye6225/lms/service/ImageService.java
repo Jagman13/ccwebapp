@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,11 +37,6 @@ public class ImageService {
 
     @Autowired
     private BookService bookService;
-
-
-    //Save the uploaded file to this folder
-    @Value("${file.local.path}")
-    private String UPLOADED_FOLDER;
 
     public Image saveImage(String fileName , Book b){
         Image  newImg = new Image();
@@ -110,7 +106,13 @@ public class ImageService {
         if (!fileExtension.equalsIgnoreCase("jpg") && !fileExtension.equalsIgnoreCase("png") && !fileExtension.equalsIgnoreCase("jpeg") ) {
             throw new Exception("File extension is not supported");
         }
-        String destinationFilePath =UPLOADED_FOLDER + book.getId()+"_"+fileNameNew;
+
+        String currentUsersHomeDir = System.getProperty("user.home");
+        File folder = new File(currentUsersHomeDir + "//csye6225Pictures" );
+        folder.mkdirs();
+
+
+        String destinationFilePath =folder.getAbsolutePath() +"/" +book.getId()+"_"+fileNameNew;
         try {
             byte[] bytes = file.getBytes();
             Path path = Paths.get(destinationFilePath);
