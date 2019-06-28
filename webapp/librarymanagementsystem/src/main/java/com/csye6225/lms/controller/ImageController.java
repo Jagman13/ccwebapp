@@ -1,4 +1,6 @@
 package com.csye6225.lms.controller;
+import com.csye6225.lms.service.AmazonS3ImageService;
+import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -32,8 +32,13 @@ public class ImageController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private AmazonS3ImageService s3ImageService;
+
+    @Autowired
+    private Environment environment;
+
     @PostMapping(value = "/{id}/image")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public ResponseEntity<Image> saveImage(@PathVariable UUID id , @RequestPart("url") MultipartFile file, UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
@@ -45,8 +50,18 @@ public class ImageController {
         }
 
         Book b = book.get();
-        String fileName = file.getOriginalFilename();
-        Image image = imageService.saveImage(b,fileName,file);
+        String originalFileName = file.getOriginalFilename();
+        Image image = null;
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
+            //save to s3 and database
+            String preSignedUrl= s3ImageService.uploadImageToS3(b , file);
+            image = imageService.saveImageToDatabase( b.getId()+ "_" + originalFileName, b);
+            image.setUrl(preSignedUrl);
+        }else {
+            //save to local
+            String imageUrl = imageService.saveImageToDisk(b , originalFileName, file);
+            image = imageService.saveImageToDatabase( imageUrl, b);
+        }
         return  ResponseEntity.ok(image);
     }
 
@@ -54,28 +69,53 @@ public class ImageController {
     public ResponseEntity<Image> getImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) {
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Image> image = imageService.getImage(idImage);
-        return ResponseEntity.ok(image.get());
+        Image existingImage= image.get();
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
+            // get preSignedUrl
+            existingImage.setUrl(s3ImageService.getPreSignedUrl(existingImage.getUrl()));
+        }
+        return ResponseEntity.ok(existingImage);
     }
 
     @DeleteMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Object> deleteImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) throws Exception {
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
-        imageService.DeleteImage(book.get());
-        imageService.deleteImage(book.get().getImageDetails().getId(),book.get());
+        Image image = book.get().getImageDetails();
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
+            //save to s3
+            s3ImageService.deleteImageFromS3(image.getUrl());
+        }else {
+            //delete from local
+            imageService.deleteImageFromDisk(image.getUrl());
+
+        }
+        imageService.deleteImageFromDatabase(image.getId(),book.get());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/{idBook}/image/{idImage}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public ResponseEntity<Object> putImage(@PathVariable UUID idBook ,@PathVariable UUID idImage,@RequestPart("url") MultipartFile file) throws Exception {
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
-        //Deleting the image from location
-        imageService.DeleteImage(book.get());
         String fileNameNew = file.getOriginalFilename();
-        //Adding new image to the location
-        Image image =imageService.updateImage(fileNameNew,book.get(),file,idImage);
+        String imageUrl= null;
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
+            //delete existing image from s3
+            //s3ImageService.deleteImageFromS3(image.getUrl());
+
+            //save new image to s3
+            s3ImageService.uploadImageToS3(book.get() , file);
+            imageUrl = book.get().getId()+ "_" + fileNameNew;
+        }else {
+            //delete from local
+            imageService.deleteImageFromDisk(book.get().getImageDetails().getUrl());
+            // save new image to disk and database
+            imageUrl = imageService.saveImageToDisk(book.get(), fileNameNew, file);
+        }
+
+        Image image =imageService.updateImage(book.get(), imageUrl, idImage);
+
         return ResponseEntity.noContent().build();
     }
 
