@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 @Service
@@ -39,26 +40,20 @@ public class AmazonS3ImageService {
         this.amazonS3 = AmazonS3ClientBuilder.standard().withCredentials(new EnvironmentVariableCredentialsProvider()).build();
     }
 
-
     public String uploadImageToS3(Book book, MultipartFile multipartFile) throws IOException {
-            File fileToUpload = convertMultiPartToFile(multipartFile);
-            String key = book.getId()+ "_" + fileToUpload.getName();
-            /* save file to S3 */
-            amazonS3.putObject(new PutObjectRequest(s3BucketName, key, fileToUpload));
-            String signedUrl = getPreSignedUrl(key);
+        // File fileToUpload = convertMultiPartToFile(multipartFile);
+        ObjectMetadata objMeta = new ObjectMetadata();
+        objMeta.setContentType("image");
+        String key = book.getId()+ "_" + multipartFile.getOriginalFilename();
+        /* save file to S3 */
+        InputStream file = multipartFile.getInputStream();
+        amazonS3.putObject(new PutObjectRequest(s3BucketName, key, file, objMeta));
+        String signedUrl = getPreSignedUrl(key);
         return signedUrl;
     }
 
     public void deleteImageFromS3(String key){
         amazonS3.deleteObject(new DeleteObjectRequest(s3BucketName, key));
-    }
-
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convFile;
     }
 
     public String getPreSignedUrl(String key){
