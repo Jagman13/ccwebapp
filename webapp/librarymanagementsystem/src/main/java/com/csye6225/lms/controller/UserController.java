@@ -43,7 +43,7 @@ public class UserController {
 		return ResponseEntity.ok(gson.toJson(jsonObject));
 	}
 
-	@PostMapping(value = "/user/register/")
+	@PostMapping(value = "/user/register")
 	public ResponseEntity<String> register(@Valid @RequestBody User user) {
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
