@@ -3,9 +3,11 @@ package com.csye6225.lms.controller;
 import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.RestApiError;
+import com.csye6225.lms.service.AmazonS3ImageService;
 import com.csye6225.lms.service.BookService;
 import com.csye6225.lms.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +32,37 @@ public class BookController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    private AmazonS3ImageService s3ImageService;
+
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
         List<Book> books = bookService.findAll();
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
+            for(Book book: books){
+                if(book.getImageDetails()!=null){
+                    book.getImageDetails().setUrl(s3ImageService.getPreSignedUrl(book.getImageDetails().getUrl()));
+                }
+            }
+        }
         return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getBook(@PathVariable UUID id) {
         Optional<Book> book = bookService.findById(id);
+        Book existingBook= book.get();
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");
         }
-        return ResponseEntity.ok(book.get());
+
+        if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod") && existingBook.getImageDetails()!=null) {
+            existingBook.getImageDetails().setUrl(s3ImageService.getPreSignedUrl(existingBook.getImageDetails().getUrl()));
+        }
+        return ResponseEntity.ok(existingBook);
     }
 
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
@@ -91,7 +111,11 @@ public class BookController {
 
         Book b = book.get();
         if(b.getImageDetails()!=null){
-            imageService.DeleteImage(b);
+            if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")){
+                s3ImageService.deleteImageFromS3(b.getImageDetails().getUrl());
+            }else{
+                imageService.deleteImageFromDisk(b.getImageDetails().getUrl());
+            }
         }
 
         bookService.deleteById(id);

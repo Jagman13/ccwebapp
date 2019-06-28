@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -38,14 +36,6 @@ public class ImageService {
     @Autowired
     private BookService bookService;
 
-    public Image saveImage(String fileName , Book b){
-        Image  newImg = new Image();
-        newImg.setUrl(fileName);
-        b.setImageDetails(newImg);
-        b = bookService.createBook(b);
-        return b.getImageDetails();
-    }
-
     public Image updateImage(Image image){
         Image newImg =imgRepository.save(image);
         return newImg;
@@ -55,7 +45,7 @@ public class ImageService {
         return imgRepository.findById(idImage);
     }
 
-    public void deleteImage(UUID idImage,Book b){
+    public void deleteImageFromDatabase(UUID idImage,Book b){
         b.setImageDetails(null);
         imgRepository.deleteById(idImage);
     }
@@ -73,9 +63,8 @@ public class ImageService {
             throw new ResourceNotFoundException("Book Id and Image Id do not match");
         }
     }
-    public void DeleteImage(Book book) throws Exception {
+    public void deleteImageFromDisk(String fileName) throws Exception {
         //Deleting the image from location
-        String fileName = book.getImageDetails().getUrl();
 
         try {
             Files.deleteIfExists(Paths.get(fileName));
@@ -90,14 +79,16 @@ public class ImageService {
 
     }
 
-    public Image saveImage(Book book, String fileNameNew ,MultipartFile file) throws Exception {
-        String destinationFilePath = checkExtension(book,fileNameNew,file);
-        Image img = saveImage(destinationFilePath , book) ;
-        return img;
+    public Image saveImageToDatabase(String imageUrl , Book b){
+        Image  newImg = new Image();
+        newImg.setUrl(imageUrl);
+        b.setImageDetails(newImg);
+        b = bookService.createBook(b);
+        return b.getImageDetails();
     }
 
 
-    public String checkExtension (Book book, String fileNameNew, MultipartFile file) throws Exception{
+    public void checkFileExtension (String fileNameNew) throws Exception{
         String fileExtension="";
         if(fileNameNew.contains(".") && fileNameNew.lastIndexOf(".")!= 0)
         {
@@ -107,12 +98,16 @@ public class ImageService {
             throw new Exception("File extension is not supported");
         }
 
+    }
+
+    public String saveImageToDisk(Book book, String fileName ,MultipartFile file) throws Exception{
+        checkFileExtension(fileName);
         String currentUsersHomeDir = System.getProperty("user.home");
         File folder = new File(currentUsersHomeDir + "//csye6225Pictures" );
         folder.mkdirs();
 
 
-        String destinationFilePath =folder.getAbsolutePath() +"/" +book.getId()+"_"+fileNameNew;
+        String destinationFilePath =folder.getAbsolutePath() +"/" +book.getId()+"_"+ fileName;
         try {
             byte[] bytes = file.getBytes();
             Path path = Paths.get(destinationFilePath);
@@ -125,15 +120,12 @@ public class ImageService {
         return destinationFilePath;
     }
 
-
-    public Image updateImage(String fileName , Book b, MultipartFile file ,UUID imageId) throws  Exception{
-        String newFilePath = checkExtension(b,fileName,file) ;
-
+    public Image updateImage(Book book , String fileNameNew, UUID imageId) throws Exception{
         Optional<Image>  img = imgRepository.findById(imageId);
-        img.get().setUrl(newFilePath);
-        b.setImageDetails(img.get());
-        b =bookService.createBook(b);
-        return b.getImageDetails();
+        img.get().setUrl(fileNameNew);
+        book.setImageDetails(img.get());
+        book =bookService.createBook(book);
+        return book.getImageDetails();
     }
 
 }

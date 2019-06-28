@@ -6,6 +6,8 @@ import com.csye6225.lms.dao.UserRepository;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,17 +28,22 @@ public class UserController {
 	@Autowired
 	private CustomUserDetailsService userService ;
 
+	@Autowired
+	private Environment environment;
+
+
 
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {
 		Date date = new Date();
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("message", "You are logged in. The current time is " + date.toString());
+		String[] profile= environment.getActiveProfiles();
+		jsonObject.addProperty("message", "You are logged in. The current time is " + date.toString() + "environment: " + profile[0]);
 		return ResponseEntity.ok(gson.toJson(jsonObject));
 	}
 
-	@PostMapping(value = "/user/register")
+	@PostMapping(value = "/user/register/")
 	public ResponseEntity<String> register(@Valid @RequestBody User user) {
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
