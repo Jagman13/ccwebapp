@@ -51,7 +51,7 @@
         "InstanceTenancy": "default",
 
         "Tags" : [
-          { "Key" : "Name", "Value" : {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "VPC"]] }}
+          { "Key" : "Name", "Value" : {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "VPC"]] }}
         ]
 
 
@@ -71,7 +71,7 @@
 
         "Tags" : [
           { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" :  {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "PublicSubnet-1"]] } }
+          { "Key" : "Name", "Value" :  {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "PublicSubnet-1"]] } }
         ]
 
       }
@@ -91,7 +91,7 @@
 
         "Tags" : [
           { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "PublicSubnet-2"]] }  }
+          { "Key" : "Name", "Value" : {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "PublicSubnet-2"]] }  }
         ]
 
       }
@@ -111,7 +111,7 @@
 
         "Tags" : [
           { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "PublicSubnet-3"]] }  }
+          { "Key" : "Name", "Value" : {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "PublicSubnet-3"]] }  }
         ]
 
       }
@@ -123,7 +123,7 @@
       "Type" : "AWS::EC2::InternetGateway",
       "Properties" : {
         "Tags" : [
-          { "Key" : "Name", "Value" : {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "InternetGateway"]] }},
+          { "Key" : "Name", "Value" : {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "InternetGateway"]] }},
           { "Key" : "Network", "Value" : "Public" }
         ]
       }
@@ -145,7 +145,7 @@
         "VpcId" : { "Ref" : "myVPC" },
         "Tags" : [
            { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : {"Fn::Join":["_",[{"Ref" :"EnvironmentName"}, "RouteTable"]] } }
+          { "Key" : "Name", "Value" : {"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "RouteTable"]] } }
         ]
       }
     },
@@ -186,9 +186,59 @@
         "DestinationCidrBlock" : { "Ref" : "DestinationCidrBlock" },
         "GatewayId" : { "Ref" : "myInternetGateway" }
       }
-    },
+    }
+
+  },
+
+  "Outputs": {
+      "WebSubnet": {
+        "Description":"Public Subnet Id for Web-server",
+        "Value": { "Ref" : "PublicSubnet1" },
+        "Export":{
+          "Name":{"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "Subnet1"]] } }
+        } ,
+      
+
+      "VPCID": {
+        "Description":"VPC ID ",
+        "Value": { "Ref" : "myVPC" },
+        "Export":{
+          "Name":{"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "VPCID"]] } }
+        
+      },
+      
+       "dbsubnetgroup1": {
+        "Description":"dbsubnetgroup1",
+        "Value": { "Ref" : "PublicSubnet2" },
+        "Export":{
+          "Name":{"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "Subnet2"]] } }
+        
+      },
+      "dbsubnetgroup2": {
+        "Description":"dbsubnetgroup2 ",
+        "Value": { "Ref" : "PublicSubnet3" },
+        "Export":{
+          "Name":{"Fn::Join":["-",[{"Ref" :"EnvironmentName"}, "Subnet3"]] } }
+        }
+      }
+    }
+
+
+
+    
+  
+
+
+
+
+
+
 
    
-  }
-
-}
+   
+      
+     
+        
+      
+  
+   
