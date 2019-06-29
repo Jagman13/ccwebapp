@@ -102,8 +102,7 @@ public class ImageController {
         String imageUrl= null;
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
             //delete existing image from s3
-            //s3ImageService.deleteImageFromS3(image.getUrl());
-
+            s3ImageService.deleteImageFromS3(book.get().getImageDetails().getUrl());
             //save new image to s3
             s3ImageService.uploadImageToS3(book.get() , file);
             imageUrl = book.get().getId()+ "_" + fileNameNew;

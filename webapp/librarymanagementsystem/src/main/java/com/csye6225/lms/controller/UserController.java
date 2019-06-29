@@ -39,7 +39,7 @@ public class UserController {
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
 		String[] profile= environment.getActiveProfiles();
-		jsonObject.addProperty("message", "You are logged in. The current time is " + date.toString() + "environment: " + profile[0]);
+		jsonObject.addProperty("message", "You are logged in. The current time is " + date.toString() + " .Environment is: " + profile[0]);
 		return ResponseEntity.ok(gson.toJson(jsonObject));
 	}
 
