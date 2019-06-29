@@ -41,7 +41,7 @@
 <p>Open terminal and run the script in the below format with parameters</p>
    ```sh
         $ ./csye6225-aws-cf-create-application-stack.sh <application-stack-name> <network-stack-name> <ami-id>
-```
+ ```
 ## Termination stack scripts: 
   script should take STACK_NAME as parameter
   Sequence of termination stacks should be application->cicd->network
