@@ -53,7 +53,7 @@
   
      ```sh
         $ ./csye6225-aws-cf-termiante-stack.sh <stack-mame>
-  ```
+     ```
  
   <li> "csye6225-aws-cf-terminate-application-stack.sh": Delete the stack and all application and server resources</li>
 </ul>
