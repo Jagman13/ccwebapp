@@ -9,7 +9,7 @@
 	  exit
 }
 
-	STACK_NAME=$1
+	STACK_NAME=$1-NetworkStack
 	REGION_NAME=$2
 	CIDR_BLOCK=$3
 	SUBNET1_CIDR=$4

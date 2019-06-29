@@ -28,6 +28,7 @@
 <p>Open terminal and run the script in the below format with parameters</p>
    ```sh
         $ ./csye6225-aws-cf-create-stack.sh <stack-name> <region-name> <vpc-cidr-block> <subnet1-cidr-block> <subnet2-cidr-block> 
+ ```
 
 ## "csye6225-aws-cf-create-application-stack.sh" script will
 <ul>
@@ -39,9 +40,8 @@
 
 <p>Open terminal and run the script in the below format with parameters</p>
    ```sh
-        $ ./csye6225-aws-cf-create-application-stack.sh <application-stack-name> <network-stack-name> <ami-id> 
-
-
+        $ ./csye6225-aws-cf-create-application-stack.sh <application-stack-name> <network-stack-name> <ami-id>
+```
 ## Termination stack scripts: 
   script should take STACK_NAME as parameter
   Sequence of termination stacks should be application->cicd->network
@@ -49,7 +49,7 @@
   <li> "csye6225-aws-cf-terminate-stack.sh": Delete the stack and all networking resources.</li>
      ```sh
         $ ./csye6225-aws-cf-termiante-stack.sh <stack-mame>
-
+```
   <li> "csye6225-aws-cf-terminate-application-stack.sh": Delete the stack and all application and server resources
 </ul>
         
