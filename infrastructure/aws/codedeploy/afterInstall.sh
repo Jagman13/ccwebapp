@@ -2,11 +2,11 @@
 
 sudo systemctl stop tomcat.service
 
-sudo rm -rf /opt/tomcat/webapps/docs  /opt/tomcat/webapps/examples /opt/tomcat/webapps/host-manager  /opt/tomcat/webapps/manager /opt/tomcat/webapps/ROOT
+sudo rm -rf /opt/tomcat/latest/webapps/docs  /opt/tomcat/latest/webapps/examples /opt/tomcat/latest/webapps/host-manager  /opt/tomcat/latest/webapps/manager /opt/tomcat/latest/webapps/ROOT
 
-sudo chown tomcat:tomcat /opt/tomcat/webapps/ROOT.war
+sudo chown tomcat:tomcat /opt/tomcat/latest/webapps/librarymanagementsystem-0.0.1-SNAPSHOT.war
 
 # cleanup log files
-sudo rm -rf /opt/tomcat/logs/catalina*
-sudo rm -rf /opt/tomcat/logs/*.log
-sudo rm -rf /opt/tomcat/logs/*.txt
+sudo rm -rf /opt/tomcat/latest/logs/catalina*
+sudo rm -rf /opt/tomcat/latest/logs/*.log
+sudo rm -rf /opt/tomcat/latest/logs/*.txt

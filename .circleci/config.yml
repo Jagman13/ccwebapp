@@ -1,29 +1,40 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/webapp
+    filters:
+      branches:
+        only:
+          - Assignment5
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/python
     steps:
       - checkout
       - run:
           name: Build Artifact
           command: |
-            cd webapp
-            ./gradlew war
-            cd build/libs
-            ls -al
-            cd ../../..
+            sudo apt update
+            sudo apt install openjdk-8-jdk
+            sudo pip install awscli
       - run:
-          name: Zip Artifact
+          name: Build WAR
+          command: |
+            cd webapp/librarymanagementsystem
+            ./mvn clean package
+            cd target
+            ls -al
+            ls -al target
+      - run:
+          name: Build Deployment Artifact
           command: |
             echo "Hello the current build number is ${CIRCLE_BUILD_NUM}"
             pwd
             ls -al
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
-            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp/build/libs/ROOT.war *.sh *.yml
+            zip -r csye6225-webapp-${CIRCLE_BUILD_NUM}.zip webapp/librarymanagementsystem/target/librarymanagementsystem-0.0.1-SNAPSHOT.war codedeploy/*.sh appspec.yml
             ls -al
-            mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
+            mv csye6225-webapp-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
             ls -al
             pwd
             cd codedeploy_artifact
@@ -34,9 +45,4 @@ jobs:
             ls -al
       - run:
           name: Upload Artifact to S3
-          command: |
-            echo "Hello"
-      - run:
-          name: Make CodeDeploy API call
-          command: |
-            echo "Hello CodeDeploy" 
+          command: aws s3 sync ./codedeploy_artifact s3://code-deploy.csye6225-su19-patilyo.me

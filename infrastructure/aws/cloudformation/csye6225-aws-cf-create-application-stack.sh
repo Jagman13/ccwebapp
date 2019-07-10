@@ -5,7 +5,7 @@
  help_me()
 {
 	  echo "Usage:-"
-	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname>"
+	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname> <BucketName>"
 	  exit
 }
 
@@ -13,8 +13,9 @@
 	NET_STACK_NAME=$2-NetworkStack
 	AMI_ID=$3
 	KeyName=$4
+	BucketName=$5
 
-	if [ $# -ne 4 ]
+	if [ $# -ne 5 ]
 	then 
 		echo -e "You are missing some parameters"
 		help_me
@@ -54,7 +55,10 @@ aws cloudformation create-stack --stack-name $APP_STACK_NAME --template-body fil
  ParameterKey=Subnet2,ParameterValue=$Subnet2 \
  ParameterKey=Subnet3,ParameterValue=$Subnet3\
  ParameterKey=VPC,ParameterValue=$NET_VPC_ID\
- ParameterKey=keyname,ParameterValue=$KeyName
+ ParameterKey=keyname,ParameterValue=$KeyName\
+ ParameterKey=S3CodeBucket,ParameterValue=$BucketName\
+ --capabilities CAPABILITY_NAMED_IAM
+
 
  
  
