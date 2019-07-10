@@ -20,7 +20,7 @@ jobs:
           name: Build WAR
           command: |
             cd webapp/librarymanagementsystem
-            ./mvn clean package
+            mvn clean package
             cd target
             ls -al
             ls -al target
