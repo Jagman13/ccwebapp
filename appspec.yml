@@ -1,12 +1,18 @@
 version: 0.0
 os: linux
 
-files:             
-  - source: ./webapp/build/libs/ROOT.war
-    destination: /opt/tomcat/webapps
+
+files:
+  - source: /ccwebapp/webapp/librarymanagementsystem/target/librarymanagementsystem-0.0.1-SNAPSHOT.war
+    destination: /opt/tomcat/latest/webapps
 
 hooks:
   AfterInstall:
-   - location: ./afterInstall.sh
-     timeout: 180
-     runas: centos
+    - location: ./afterInstall.sh
+
+      timeout: 180
+      runas: centos
+  ApplicationStart:
+    - location: ./applicationStart.sh
+      timeout: 180
+runas: centos
