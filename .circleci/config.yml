@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/webapp
+    working_directory: ~/webapp/librarymanagementsystem
     filters:
       branches:
         only:
@@ -21,6 +21,7 @@ jobs:
           command: |
             pwd
             ls
+            cd webapp/librarymanagementsystem
             ./mvnw clean package
             pwd
             ls -al
