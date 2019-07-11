@@ -143,85 +143,160 @@
           ],
           "ImageId" :{"Ref" : "AMIID"},
           "InstanceInitiatedShutdownBehavior" : "terminate",
-          "IamInstanceProfile" : {
-            "Arn" : {"Fn::GetAtt" : [
-              "CodeDeployServiceRole", 
-              "Arn"
+          "IamInstanceProfile" : {"Ref" : "CodeDeployEC2ServiceInstanceProfile"},
+          "InstanceType" : "t2.micro",
+          "KeyName" :  {"Ref": "keyname"},
+          "SecurityGroupIds" :[{
+            "Fn::GetAtt": [
+              "InstanceSecurityGroup",
+              "GroupId"
             ]
-          }
-        },
-        "InstanceType" : "t2.micro",
-        "KeyName" :  {"Ref": "keyname"},
-        "SecurityGroupIds" :[{
-          "Fn::GetAtt": [
-            "InstanceSecurityGroup",
-            "GroupId"
-          ]
-        }],
-        "SubnetId" : {"Ref" : "Subnet1" },
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Join": ["\n",
-             [ "#!/bin/bash -xe ",
-              "sudo echo SPRING_PROFILES_ACTIVE=prod | sudo tee -a /usr/lib/systemd/system/envVariables",
-              "sudo echo SPRING_DATASOURCE_USERNAME=csye6225master |  sudo tee -a /usr/lib/systemd/system/envVariables",
-              "sudo echo SPRING_DATASOURCE_PASSWORD=csye6225password |  sudo tee -a /usr/lib/systemd/system/envVariables",
-              {
-                "Fn::Join": [
-                  "",
-                  [
-                    "sudo echo SPRING_DATASOURCE_URL=jdbc:mysql://",
-                    {
-                      "Fn::GetAtt": [
-                        "DBInstance",
-                        "Endpoint.Address"
-                      ]
-                    },
-                    ":3306/csye6225 | sudo tee -a /usr/lib/systemd/system/envVariables"
+          }],
+          "SubnetId" : {"Ref" : "Subnet1" },
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": ["\n",
+               [ "#!/bin/bash -xe ",
+                "sudo echo SPRING_PROFILES_ACTIVE=prod | sudo tee -a /usr/lib/systemd/system/envVariables",
+                "sudo echo SPRING_DATASOURCE_USERNAME=csye6225master |  sudo tee -a /usr/lib/systemd/system/envVariables",
+                "sudo echo SPRING_DATASOURCE_PASSWORD=csye6225password |  sudo tee -a /usr/lib/systemd/system/envVariables",
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "sudo echo SPRING_DATASOURCE_URL=jdbc:mysql://",
+                      {
+                        "Fn::GetAtt": [
+                          "DBInstance",
+                          "Endpoint.Address"
+                        ]
+                      },
+                      ":3306/csye6225 | sudo tee -a /usr/lib/systemd/system/envVariables"
+                    ]
                   ]
-                ]
-              },
-              {"Fn::Join": [
-                "",
-                ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3CodeBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]}
+                },
+                {"Fn::Join": [
+                  "",
+                  ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3CodeBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]}
 
-            ] ]}},
-            "Tags" : [
-              { "Key" : "EC2", "Value" : "EC2" } ]
-          }
-        },
+              ] ]}},
+              "Tags" : [
+                { "Key" : "EC2", "Value" : "EC2" } ]
+            }
+          },
 
-        "DBSubnetGroup": {
-          "Type": "AWS::RDS::DBSubnetGroup",
+          "DBSubnetGroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+              "DBSubnetGroupDescription": "Subnets for RDS DB Instance",
+              "SubnetIds": [ { "Ref" : "Subnet1" },
+               { "Ref" : "Subnet2"} ]
+            }
+          },
+
+
+          "DBInstance":{
+            "Type" : "AWS::RDS::DBInstance",
+            "Properties" : {
+              "AllocatedStorage" : "20",
+              "DBInstanceClass" : "db.t2.micro",
+              "DBInstanceIdentifier" : "csye6225-su19",
+              "DBName" : "csye6225",
+              "DBSubnetGroupName" :{"Ref":"DBSubnetGroup"},
+              "DBSecurityGroups" : [{"Ref":"DBSecurityGroup"}],
+              "Engine" : "MySQL",
+              "EngineVersion" : "8.0.15",
+              "MasterUserPassword" : "csye6225password",
+              "MasterUsername" : "csye6225master",
+              "MultiAZ" : false,
+              "PubliclyAccessible" : true ,
+              "VPCSecurityGroups": [{"Ref":"DBSecurityGroup"}]
+              
+            }
+          } , 
+
+          "CodeDeployServiceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+               "Version" : "2012-10-17",
+               "Statement": [ {
+                "Effect": "Allow",
+                "Principal": {
+                 "Service": [ "codedeploy.us-east-1.amazonaws.com" ]
+               },
+               "Action": [ "sts:AssumeRole" ]
+             } ]
+             },
+             "ManagedPolicyArns":[
+              "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+            ],
+             "Path": "/",
+             "RoleName": "CodeDeployServiceRole"
+           }
+         },
+
+         "CodeDeployApplication": {
+          "Type": "AWS::CodeDeploy::Application",
           "Properties": {
-            "DBSubnetGroupDescription": "Subnets for RDS DB Instance",
-            "SubnetIds": [ { "Ref" : "Subnet1" },
-             { "Ref" : "Subnet2"} ]
+            "ApplicationName" : "csye6225-webapp",
+            "ComputePlatform": "Server"
+          }
+        },
+        
+        "DeploymentGroup" : {
+          "Type" : "AWS::CodeDeploy::DeploymentGroup",
+          "Properties" : {
+            "ApplicationName" : "csye6225-webapp",
+            "DeploymentConfigName" : "CodeDeployDefault.AllAtOnce",
+            "DeploymentGroupName": "csye6225-webapp-deployment",
+            "DeploymentStyle":{
+              "DeploymentOption" : "WITHOUT_TRAFFIC_CONTROL",
+              "DeploymentType" : "IN_PLACE"
+            },
+            "AutoRollbackConfiguration": {
+              "Enabled": "true",
+              "Events": [ "DEPLOYMENT_FAILURE" ]
+            },
+            "Ec2TagFilters" : [{
+              "Key" : "EC2",
+              "Value" :"EC2",
+              "Type" : "KEY_AND_VALUE"
+            }],
+            "ServiceRoleArn" : {
+              "Fn::GetAtt" : [
+                "CodeDeployServiceRole", 
+                "Arn"
+              ]
+            }
           }
         },
 
-
-        "DBInstance":{
-          "Type" : "AWS::RDS::DBInstance",
+        "CodeDeployEC2S3" : {
+          "Type" : "AWS::IAM::ManagedPolicy",
           "Properties" : {
-            "AllocatedStorage" : "20",
-            "DBInstanceClass" : "db.t2.micro",
-            "DBInstanceIdentifier" : "csye6225-su19",
-            "DBName" : "csye6225",
-            "DBSubnetGroupName" :{"Ref":"DBSubnetGroup"},
-            "DBSecurityGroups" : [{"Ref":"DBSecurityGroup"}],
-            "Engine" : "MySQL",
-            "EngineVersion" : "8.0.15",
-            "MasterUserPassword" : "csye6225password",
-            "MasterUsername" : "csye6225master",
-            "MultiAZ" : false,
-            "PubliclyAccessible" : true ,
-            "VPCSecurityGroups": [{"Ref":"DBSecurityGroup"}]
-            
+            "ManagedPolicyName": "CodeDeploy-EC2-S3",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:Get*",
+                    "s3:List*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource":[
+                    "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me", 
+                    "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me/*"
+                  ]
+                }
+              ]
+            }
           }
-        } , 
+        },
 
-        "CodeDeployServiceRole": {
+        "CodeDeployEC2ServiceRole": {
+          "DependsOn" : ["CodeDeployEC2S3"],
           "Type": "AWS::IAM::Role",
           "Properties": {
             "AssumeRolePolicyDocument": {
@@ -229,109 +304,28 @@
              "Statement": [ {
               "Effect": "Allow",
               "Principal": {
-               "Service": [ "codedeploy.us-east-1.amazonaws.com" ]
+               "Service": [ "ec2.amazonaws.com" ]
              },
              "Action": [ "sts:AssumeRole" ]
            } ]
            },
            "ManagedPolicyArns":[
-            "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+            {"Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref" : "AWS::AccountId" }, ":policy/CodeDeploy-EC2-S3"] ]}
           ],
            "Path": "/",
-           "RoleName": "CodeDeployServiceRole"
+           "RoleName": "CodeDeployEC2ServiceRole"
          }
        },
-
-       "CodeDeployApplication": {
-        "Type": "AWS::CodeDeploy::Application",
+       "CodeDeployEC2ServiceInstanceProfile": {
+        "DependsOn" : ["CodeDeployEC2ServiceRole"],
+        "Type": "AWS::IAM::InstanceProfile",
         "Properties": {
-          "ApplicationName" : "csye6225-webapp",
-          "ComputePlatform": "Server"
-        }
-      },
-      
-      "DeploymentGroup" : {
-        "Type" : "AWS::CodeDeploy::DeploymentGroup",
-        "Properties" : {
-          "ApplicationName" : "csye6225-webapp",
-          "DeploymentConfigName" : "CodeDeployDefault.AllAtOnce",
-          "DeploymentGroupName": "csye6225-webapp-deployment",
-          "DeploymentStyle":{
-            "DeploymentOption" : "WITHOUT_TRAFFIC_CONTROL",
-            "DeploymentType" : "IN_PLACE"
-          },
-          "AutoRollbackConfiguration": {
-            "Enabled": "true",
-            "Events": [ "DEPLOYMENT_FAILURE" ]
-          },
-          "Ec2TagFilters" : [{
-            "Key" : "EC2",
-            "Value" :"EC2",
-            "Type" : "KEY_AND_VALUE"
-          }],
-          "ServiceRoleArn" : {
-            "Fn::GetAtt" : [
-              "CodeDeployServiceRole", 
-              "Arn"
-            ]
-          }
-        }
-      },
-
-      "CodeDeployEC2S3" : {
-        "Type" : "AWS::IAM::ManagedPolicy",
-        "Properties" : {
-          "ManagedPolicyName": "CodeDeploy-EC2-S3",
-          "PolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Action": [
-                  "s3:Get*",
-                  "s3:List*"
-                ],
-                "Effect": "Allow",
-                "Resource":[
-                  "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me", 
-                  "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me/*"
-                ]
-              }
-            ]
-          }
-        }
-      },
-
-      "CodeDeployEC2ServiceRole": {
-        "DependsOn" : ["CodeDeployEC2S3"],
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-          "AssumeRolePolicyDocument": {
-           "Version" : "2012-10-17",
-           "Statement": [ {
-            "Effect": "Allow",
-            "Principal": {
-             "Service": [ "ec2.amazonaws.com" ]
-           },
-           "Action": [ "sts:AssumeRole" ]
+          "Path": "/",
+          "Roles": [ {
+           "Ref": "CodeDeployEC2ServiceRole"
          } ]
-         },
-         "ManagedPolicyArns":[
-          {"Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref" : "AWS::AccountId" }, ":policy/CodeDeploy-EC2-S3"] ]}
-        ],
-         "Path": "/",
-         "RoleName": "CodeDeployEC2ServiceRole"
-       }
-     },
-     "CodeDeployEC2ServiceInstanceProfile": {
-      "DependsOn" : ["CodeDeployEC2ServiceRole"],
-      "Type": "AWS::IAM::InstanceProfile",
-      "Properties": {
-        "Path": "/",
-        "Roles": [ {
-         "Ref": "CodeDeployEC2ServiceRole"
-       } ]
+        }
       }
-    }
 
+    }
   }
-}
