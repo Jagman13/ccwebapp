@@ -48,7 +48,8 @@ jobs:
           command: aws s3 sync ./codedeploy_artifact ${S3_BUCKET_NAME}
       - run:
           name: Deploy artifact to ec2 instance
-          command: aws deploy create-deployment \
+          command: |
+            aws deploy create-deployment \
             --application-name csye6225-webapp \
             --deployment-group-name csye6225-webapp-deployment \
             --s3-location bucket=${S3_BUCKET_NAME},bundleType=zip,key=csye6225-webapp-${CIRCLE_BUILD_NUM}.zip
