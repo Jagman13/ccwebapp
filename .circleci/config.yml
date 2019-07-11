@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build Artifact
+          name: Install packages
           command: |
             sudo apt update
             sudo apt install openjdk-8-jdk
@@ -45,4 +45,10 @@ jobs:
             ls -al
       - run:
           name: Upload Artifact to S3
-          command: aws s3 sync ./codedeploy_artifact s3://code-deploy.csye6225-su19-patilyo.me
+          command: aws s3 sync ./codedeploy_artifact ${S3_BUCKET_NAME}
+      - run:
+          name: Deploy artifact to ec2 instance
+          command: aws deploy create-deployment \
+          --application-name csye6225-webapp \
+          --deployment-group-name csye6225-webapp-deployment \
+          --s3-location bucket=${S3_BUCKET_NAME},bundleType=zip,key=csye6225-webapp-${CIRCLE_BUILD_NUM}.zip
