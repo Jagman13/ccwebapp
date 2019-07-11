@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("bookyogita")
+@RequestMapping("book")
 public class BookController {
 
     @Autowired
