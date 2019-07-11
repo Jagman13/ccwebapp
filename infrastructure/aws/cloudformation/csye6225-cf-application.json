@@ -38,18 +38,23 @@
         "Default" : "vpc-78523602"
       },
 
-      "S3CodeBucket":{
-
-        "Default": "kaurj",
-
+      "S3CodeDeployBucket":{
+        "Description": "S3 bucket name where code deploy artifacts are stored",
         "Type": "String"
-      }
+      },
 
+      "S3ImageBucket":{
+        "Description": "S3 bucket name where Images are stored",
+        "Type": "String"
+      },
+      "CFNUser" : {
+        "Type": "String",
+        "Default": "circleci"
+      }
     },
 
 
     "Resources" :{
-
       "DynamoDBTable" : {
         "Type" : "AWS::DynamoDB::Table",
         "Properties" : {
@@ -177,7 +182,7 @@
                 },
                 {"Fn::Join": [
                   "",
-                  ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3CodeBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]}
+                  ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3ImageBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]}
 
               ] ]}},
               "Tags" : [
@@ -193,7 +198,6 @@
                { "Ref" : "Subnet2"} ]
             }
           },
-
 
           "DBInstance":{
             "Type" : "AWS::RDS::DBInstance",
@@ -211,9 +215,121 @@
               "MultiAZ" : false,
               "PubliclyAccessible" : true ,
               "VPCSecurityGroups": [{"Ref":"DBSecurityGroup"}]
-              
+
             }
           } , 
+
+          "CodeDeployEC2S3" : {
+            "Type" : "AWS::IAM::ManagedPolicy",
+            "Properties" : {
+              "ManagedPolicyName": "CodeDeploy-EC2-S3",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": [
+                      "s3:Get*",
+                      "s3:List*"
+                    ],
+                    "Effect": "Allow",
+                    "Resource":[
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3CodeDeployBucket" }] ]},
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3CodeDeployBucket" }, "/*"] ]}
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "CircleCIUploadToS3" : {
+            "Type" : "AWS::IAM::ManagedPolicy",
+            "Properties" : {
+              "ManagedPolicyName": "CircleCI-Upload-To-S3",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": [
+                      "S3:List*",
+                      "s3:PutObject"
+                    ],
+                    "Effect": "Allow",
+                    "Resource":[
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3CodeDeployBucket" }] ]},
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3CodeDeployBucket" }, "/*"] ]}
+                    ]
+                  }
+                ]
+              },
+              "Users" : [ { "Ref" : "CFNUser" } ]
+            }
+          },
+
+          "CirlceCICodeDeploy" : {
+            "Type" : "AWS::IAM::ManagedPolicy",
+            "Properties" : {
+              "ManagedPolicyName": "CirlceCI-Code-Deploy",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "codedeploy:RegisterApplicationRevision",
+                      "codedeploy:GetApplicationRevision"
+                    ],
+                    "Resource": [
+                      {"Fn::Join" : [ "", [ "arn:aws:codedeploy:", { "Ref" : "AWS::Region" }, ":", { "Ref" : "AWS::AccountId" }, ":application:csye6225-webapp" ] ]}
+                    ]
+                  },
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "codedeploy:CreateDeployment",
+                      "codedeploy:GetDeployment"
+                    ],
+                    "Resource": [
+                      "*"
+                    ]
+                  },
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "codedeploy:GetDeploymentConfig"
+                    ],
+                    "Resource": [
+                      {"Fn::Join" : [ "", [ "arn:aws:codedeploy:", { "Ref" : "AWS::Region" }, ":", { "Ref" : "AWS::AccountId" }, ":deploymentconfig:CodeDeployDefault.OneAtATime"] ]},
+                      {"Fn::Join" : [ "", [ "arn:aws:codedeploy:", { "Ref" : "AWS::Region" }, ":", { "Ref" : "AWS::AccountId" }, ":deploymentconfig:CodeDeployDefault.HalfAtATime"] ]},
+                      {"Fn::Join" : [ "", [ "arn:aws:codedeploy:", { "Ref" : "AWS::Region" }, ":", { "Ref" : "AWS::AccountId" }, ":deploymentconfig:CodeDeployDefault.AllAtOnce"] ]}
+                    ]
+                  }
+                ]
+              },
+              "Users" : [ { "Ref" : "CFNUser" } ]
+            }
+          },
+
+          "ImageEC2S3":{
+            "Type" : "AWS::IAM::ManagedPolicy",
+            "Properties" : {
+              "PolicyDocument" : {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": [
+                      "s3:*"
+                    ],
+                    "Effect": "Allow",
+                    "Resource": [
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3ImageBucket" }] ]},
+                      {"Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3ImageBucket" }, "/*"] ]}
+                    ]
+                  }
+                ]
+              },
+              "ManagedPolicyName" : "ImageEC2S3"
+            }
+          },
 
           "CodeDeployServiceRole": {
             "Type": "AWS::IAM::Role",
@@ -236,67 +352,8 @@
            }
          },
 
-         "CodeDeployApplication": {
-          "Type": "AWS::CodeDeploy::Application",
-          "Properties": {
-            "ApplicationName" : "csye6225-webapp",
-            "ComputePlatform": "Server"
-          }
-        },
-        
-        "DeploymentGroup" : {
-          "Type" : "AWS::CodeDeploy::DeploymentGroup",
-          "Properties" : {
-            "ApplicationName" : "csye6225-webapp",
-            "DeploymentConfigName" : "CodeDeployDefault.AllAtOnce",
-            "DeploymentGroupName": "csye6225-webapp-deployment",
-            "DeploymentStyle":{
-              "DeploymentOption" : "WITHOUT_TRAFFIC_CONTROL",
-              "DeploymentType" : "IN_PLACE"
-            },
-            "AutoRollbackConfiguration": {
-              "Enabled": "true",
-              "Events": [ "DEPLOYMENT_FAILURE" ]
-            },
-            "Ec2TagFilters" : [{
-              "Key" : "EC2",
-              "Value" :"EC2",
-              "Type" : "KEY_AND_VALUE"
-            }],
-            "ServiceRoleArn" : {
-              "Fn::GetAtt" : [
-                "CodeDeployServiceRole", 
-                "Arn"
-              ]
-            }
-          }
-        },
-
-        "CodeDeployEC2S3" : {
-          "Type" : "AWS::IAM::ManagedPolicy",
-          "Properties" : {
-            "ManagedPolicyName": "CodeDeploy-EC2-S3",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Action": [
-                    "s3:Get*",
-                    "s3:List*"
-                  ],
-                  "Effect": "Allow",
-                  "Resource":[
-                    "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me", 
-                    "arn:aws:s3:::code-deploy.csye6225-su19-patilyo.me/*"
-                  ]
-                }
-              ]
-            }
-          }
-        },
-
-        "CodeDeployEC2ServiceRole": {
-          "DependsOn" : ["CodeDeployEC2S3"],
+         "CodeDeployEC2ServiceRole": {
+          "DependsOn" : ["CodeDeployEC2S3", "ImageEC2S3"],
           "Type": "AWS::IAM::Role",
           "Properties": {
             "AssumeRolePolicyDocument": {
@@ -310,12 +367,14 @@
            } ]
            },
            "ManagedPolicyArns":[
-            {"Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref" : "AWS::AccountId" }, ":policy/CodeDeploy-EC2-S3"] ]}
+            {"Ref" : "CodeDeployEC2S3"},
+            {"Ref" : "ImageEC2S3"}
           ],
            "Path": "/",
            "RoleName": "CodeDeployEC2ServiceRole"
          }
        },
+
        "CodeDeployEC2ServiceInstanceProfile": {
         "DependsOn" : ["CodeDeployEC2ServiceRole"],
         "Type": "AWS::IAM::InstanceProfile",
@@ -325,7 +384,43 @@
            "Ref": "CodeDeployEC2ServiceRole"
          } ]
         }
-      }
+      },
 
+      "CodeDeployApplication": {
+        "Type": "AWS::CodeDeploy::Application",
+        "Properties": {
+          "ApplicationName" : "csye6225-webapp",
+          "ComputePlatform": "Server"
+        }
+      },
+
+      "DeploymentGroup" : {
+        "DependsOn" : ["CodeDeployServiceRole"],
+        "Type" : "AWS::CodeDeploy::DeploymentGroup",
+        "Properties" : {
+          "ApplicationName" : "csye6225-webapp",
+          "DeploymentConfigName" : "CodeDeployDefault.AllAtOnce",
+          "DeploymentGroupName": "csye6225-webapp-deployment",
+          "DeploymentStyle":{
+            "DeploymentOption" : "WITHOUT_TRAFFIC_CONTROL",
+            "DeploymentType" : "IN_PLACE"
+          },
+          "AutoRollbackConfiguration": {
+            "Enabled": "true",
+            "Events": [ "DEPLOYMENT_FAILURE" ]
+          },
+          "Ec2TagFilters" : [{
+            "Key" : "EC2",
+            "Value" :"EC2",
+            "Type" : "KEY_AND_VALUE"
+          }],
+          "ServiceRoleArn" : {
+            "Fn::GetAtt" : [
+              "CodeDeployServiceRole", 
+              "Arn"
+            ]
+          }
+        }
+      }
     }
   }
