@@ -45,7 +45,7 @@ jobs:
             ls -al
       - run:
           name: Upload Artifact to S3
-          command: aws s3 sync ./codedeploy_artifact ${S3_BUCKET_NAME}
+          command: aws s3 sync ./codedeploy_artifact s3://${S3_BUCKET_NAME}
       - run:
           name: Deploy artifact to ec2 instance
           command: |
