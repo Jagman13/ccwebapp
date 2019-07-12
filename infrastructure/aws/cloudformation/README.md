@@ -26,7 +26,6 @@
 </ul>
 
 <p>Open terminal and run the script in the below format with parameters</p>
-
    ```sh
         $ ./csye6225-aws-cf-create-stack.sh <stack-name> <region-name> <vpc-cidr-block> <subnet1-cidr-block> <subnet2-cidr-block> 
  ```
@@ -37,25 +36,37 @@
   <li>Create a DynamoDB to store tokens</li>
   <li>Create a RDS server to store POJO</li>
   <li>Create Instance and DB SecurityGroups </li>
+  <li>Create S3 Bucket</li>
+  <li>Create Policy CodeDeployEC2S3,CircleCIUploadToS3,irlceCICodeDeploy</li>
 </ul>
 
 <p>Open terminal and run the script in the below format with parameters</p>
-
    ```sh
-        $ ./csye6225-aws-cf-create-application-stack.sh <application-stack-name> <network-stack-name> <ami-id>
- ```
- 
+        $ ./csye6225-aws-cf-create-application-stack.sh <application-stack-name> <network-stack-name> <ami-id> <KeyName> <S3CodeDeployBucket> <S3ImageBucket> <User>
+  ```
+
+## "csye6225-aws-cf-create-Iam-stack.sh" script will
+<ul>
+  <li>Create circleciEc2Ami Policy for circleci User </li>
+  <li>Create a DynamoDB to store tokens</li>
+  <li>Create a RDS server to store POJO</li>
+  <li>Create Instance and DB SecurityGroups </li>
+</ul>
+
+<p>Open terminal and run the script in the below format with parameters</p>
+   ```sh
+        $ ./csye6225-aws-cf-create-Iam-stack.sh <iam-stack-name> <user>
+  ```
+
 ## Termination stack scripts: 
   script should take STACK_NAME as parameter
   Sequence of termination stacks should be application->cicd->network
 <ul>
   <li> "csye6225-aws-cf-terminate-stack.sh": Delete the stack and all networking resources.</li>
-  
      ```sh
-        $ ./csye6225-aws-cf-termiante-stack.sh <stack-mame>
-     ```
- 
-  <li> "csye6225-aws-cf-terminate-application-stack.sh": Delete the stack and all application and server resources</li>
+          $ ./csye6225-aws-cf-termiante-stack.sh <stack-mame>
+    ```
+  <li> "csye6225-aws-cf-terminate-application-stack.sh": Delete the stack and all application and server resources
 </ul>
         
 

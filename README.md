@@ -72,6 +72,6 @@ PUT 	|/book/{idBook}/image/{idImage} |	Yes 	|Update image attached to the book
 DELETE 	|/book/{idBook}/image/{idImage} |	Yes 	|Delete file attached to the book
 
 ## CI/CD
-NA for now
+[![CircleCI](https://circleci.com/gh/Jagman13/ccwebapp.svg?style=svg)](https://circleci.com/gh/Jagman13/ccwebapp)
 
 
