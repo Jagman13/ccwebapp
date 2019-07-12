@@ -1,7 +1,7 @@
 #!/bin/sh
 #shell script to create AWS network infrastructures
 
-STACK_NAME=$1
+STACK_NAME=$1-NetworkStack
 
 if [ -z "$1" ]
   then

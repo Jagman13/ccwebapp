@@ -7,7 +7,7 @@
     echo "$0 <stack name> "
     exit
 }
-STACK_NAME=$1
+STACK_NAME=$1-AppStack
 
 if [ -z "$1" ]
   then
