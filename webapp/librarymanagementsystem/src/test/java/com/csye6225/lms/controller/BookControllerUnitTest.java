@@ -36,21 +36,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BookControllerUnitTest {
 
-    private MockMvc mockMvc;
-
-    @MockBean
-    private BookService bookService;
-
-    @InjectMocks
-    private BookController bookController;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(bookController)
-                .build();
-    }
+//    private MockMvc mockMvc;
+//
+//    @MockBean
+//    private BookService bookService;
+//
+//    @InjectMocks
+//    private BookController bookController;
+//
+//    @Before
+//    public void setUp() {
+//        MockitoAnnotations.initMocks(this);
+//        mockMvc = MockMvcBuilders
+//                .standaloneSetup(bookController)
+//                .build();
+//    }
 
     @Test
     public void getAllBooks_ReturnsAllBooks() throws Exception {
