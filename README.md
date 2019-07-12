@@ -72,6 +72,13 @@ PUT 	|/book/{idBook}/image/{idImage} |	Yes 	|Update image attached to the book
 DELETE 	|/book/{idBook}/image/{idImage} |	Yes 	|Delete file attached to the book
 
 ## CI/CD
-[![CircleCI](https://circleci.com/gh/Jagman13/ccwebapp.svg?style=svg)](https://circleci.com/gh/Jagman13/ccwebapp)
+Circleci used for the continuous deployment.
+<p>In order to run the Circleci for a specific branch change the filters to that specific branch in ./circleci/config.yml</p>
+
+`filters:
+      branches:
+        only:
+          - master
+          - assignment5 `
 
 
