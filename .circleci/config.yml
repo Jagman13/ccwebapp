@@ -3,8 +3,9 @@ jobs:
   build:
     filters:
       branches:
-        only
+        only:
           - master
+          - assignment5
     docker:
       - image: circleci/python
     steps:
