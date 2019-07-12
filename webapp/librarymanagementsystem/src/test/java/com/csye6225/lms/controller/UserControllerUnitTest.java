@@ -11,10 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class UserControllerUnitTest {
 
     private MockMvc mockMvc;
@@ -70,6 +74,7 @@ public class UserControllerUnitTest {
         User actual = captor.getValue();
         assertEquals("EncodedPasswo6rd", actual.getPassword());
         assertEquals("honraoa@yahoo.com", actual.getEmail());
+        System.out.println("Test passed successfully");
     }
 
     @Test
@@ -82,6 +87,7 @@ public class UserControllerUnitTest {
         when(userRepository.findByEmail(userDetails.getEmail())).thenReturn(userDetails);
         mockMvc.perform(post("/user/register").contentType(MediaType.APPLICATION_JSON).content(gson.toJson(userDetails)))
                 .andExpect(status().isConflict());
+        System.out.println("Test passed successfully");
     }
 
 }
