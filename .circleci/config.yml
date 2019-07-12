@@ -52,5 +52,5 @@ jobs:
             aws deploy create-deployment \
             --application-name csye6225-webapp \
             --deployment-group-name csye6225-webapp-deployment \
-            --s3-location bucket=${S3_BUCKET_NAME},bundleType=zip,key=csye6225-webapp-${CIRCLE_BUILD_NUM}.zip
+            --s3-location bucket=${S3_BUCKET_NAME},bundleType=zip,key=csye6225-webapp-${CIRCLE_BUILD_NUM}.zip \
             --region ${AWS_REGION}
