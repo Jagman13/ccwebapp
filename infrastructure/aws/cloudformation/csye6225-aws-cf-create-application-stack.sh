@@ -58,6 +58,7 @@ aws cloudformation create-stack --stack-name $APP_STACK_NAME --template-body fil
  ParameterKey=Subnet3,ParameterValue=$Subnet3\
  ParameterKey=VPC,ParameterValue=$NET_VPC_ID\
  ParameterKey=keyname,ParameterValue=$KeyName\
+ ParameterKey=StackName,ParameterValue=$APP_STACK_NAME\
  ParameterKey=S3CodeDeployBucket,ParameterValue=$CODEDEPLOYBUCKET\
  ParameterKey=S3ImageBucket,ParameterValue=$S3IMAGEBUCKET\
  ParameterKey=CFNUser,ParameterValue=$USER\

@@ -13,6 +13,11 @@
         "Default" : "ami-015fcea9ff01ed264"
       },
 
+      "StackName" : {
+        "Type" : "String" ,
+        "Description" : "For KeyValue Pair"
+      },
+
       "Subnet1": {
         "Type": "AWS::EC2::Subnet::Id",
         "Description": "Subnet to launch the instance into.",
@@ -185,8 +190,6 @@
                   ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3ImageBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]}
 
               ] ]}},
-              "Tags" : [
-                { "Key" : "EC2", "Value" : "EC2" } ]
             }
           },
 
@@ -410,8 +413,8 @@
             "Events": [ "DEPLOYMENT_FAILURE" ]
           },
           "Ec2TagFilters" : [{
-            "Key" : "EC2",
-            "Value" :"EC2",
+            "Key" : "aws:cloudformation:stack-name",
+            "Value" :{ "Ref" : "StackName"},
             "Type" : "KEY_AND_VALUE"
           }],
           "ServiceRoleArn" : {
