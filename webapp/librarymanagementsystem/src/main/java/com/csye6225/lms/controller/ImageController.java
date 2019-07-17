@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("book")
+@RequestMapping("bookAWS")
 public class ImageController {
 
     @Autowired
