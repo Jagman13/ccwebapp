@@ -374,7 +374,8 @@
            },
            "ManagedPolicyArns":[
             {"Ref" : "CodeDeployEC2S3"},
-            {"Ref" : "ImageEC2S3"}
+            {"Ref" : "ImageEC2S3"},
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
           ],
            "Path": "/",
            "RoleName": "CodeDeployEC2ServiceRole"

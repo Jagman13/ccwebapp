@@ -6,6 +6,8 @@ import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.service.AmazonS3ImageService;
 import com.csye6225.lms.service.BookService;
 import com.csye6225.lms.service.ImageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +25,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("bookAWS")
+@RequestMapping("book")
 public class BookController {
+
+    private final static Logger logger = LoggerFactory.getLogger(BookController.class);
 
     @Autowired
     private BookService bookService;
@@ -40,6 +44,7 @@ public class BookController {
 
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
+        logger.info("This is test log for getallbooks");
         List<Book> books = bookService.findAll();
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
             for(Book book: books){
