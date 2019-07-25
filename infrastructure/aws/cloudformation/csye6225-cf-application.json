@@ -190,8 +190,10 @@
                   ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3ImageBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]} ,
 
                 "sudo systemctl daemon-reload",
-                "sudo systemctl restart tomcat.service"
-
+                "sudo systemctl restart tomcat.service",
+                "cp /tmp/cloudwatchconfig.json /home/centos/",
+                "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/centos/cloudwatchconfig.json -s",
+                "sudo service amazon-cloudwatch-agent.service start"
               ] ]}},
             }
           },

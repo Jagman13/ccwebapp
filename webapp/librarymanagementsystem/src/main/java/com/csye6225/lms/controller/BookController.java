@@ -6,6 +6,7 @@ import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.service.AmazonS3ImageService;
 import com.csye6225.lms.service.BookService;
 import com.csye6225.lms.service.ImageService;
+import com.timgroup.statsd.StatsDClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class BookController {
     private final static Logger logger = LoggerFactory.getLogger(BookController.class);
 
     @Autowired
+    private StatsDClient statsDClient;
+
+    @Autowired
     private BookService bookService;
 
     @Autowired
@@ -45,6 +49,7 @@ public class BookController {
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
         logger.info("This is test log for getallbooks");
+        statsDClient.incrementCounter("endpoint.allbook.http.get");
         List<Book> books = bookService.findAll();
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
             for(Book book: books){
