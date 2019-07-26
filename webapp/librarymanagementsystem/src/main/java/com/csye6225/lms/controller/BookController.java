@@ -29,6 +29,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("book")
 public class BookController {
+
     static {
 
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
@@ -52,8 +53,8 @@ public class BookController {
 
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
-        statsDClient.incrementCounter("endpoint.allbooks.http.get");
-        logger.debug("Inside method getbooks");
+        statsDClient.incrementCounter("endpoint.allbook.http.get");
+        logger.info("Get all books endpoint request");
         List<Book> books = bookService.findAll();
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
             for(Book book: books){
@@ -88,9 +89,11 @@ public class BookController {
 
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
+
         Gson gson= new Gson();
         statsDClient.incrementCounter("endpoint.addBook.http.post");
         logger.debug("Add book request " + gson.toJson(newBook));
+
         newBook.setId(null);
         Book book = bookService.createBook(newBook);
         if (book == null) {
@@ -112,6 +115,7 @@ public class BookController {
     public ResponseEntity<Object> updateBook(@Valid @RequestBody Book book) {
         Gson gson = new Gson();
         statsDClient.incrementCounter("endpoint.updateBook.http.put");
+
         if (book.getId() == null) {
             logger.error("Validation failed for request: ID cannot be null "+ gson.toJson(book) );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -132,7 +136,9 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable UUID id) throws Exception{
+
         statsDClient.incrementCounter("endpoint.deleteBook.http.delete");
+
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");

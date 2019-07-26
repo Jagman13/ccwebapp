@@ -28,6 +28,9 @@ public class UserController {
     private StatsDClient statsDClient;
 
 	@Autowired
+	private StatsDClient statsDClient;
+
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
 	private UserRepository userRepository;
@@ -40,6 +43,7 @@ public class UserController {
 
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {
+		statsDClient.incrementCounter("endpoint.homepage.http.get");
 		Date date = new Date();
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
@@ -50,6 +54,7 @@ public class UserController {
 
 	@PostMapping(value = "/user/register")
 	public ResponseEntity<String> register(@Valid @RequestBody User user) {
+		statsDClient.incrementCounter("endpoint.user.http.post");
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
 

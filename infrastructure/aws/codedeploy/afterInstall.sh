@@ -10,3 +10,5 @@ sudo chown tomcat:tomcat /opt/tomcat/latest/webapps/librarymanagementsystem-0.0.
 sudo rm -rf /opt/tomcat/latest/logs/catalina*
 sudo rm -rf /opt/tomcat/latest/logs/*.log
 sudo rm -rf /opt/tomcat/latest/logs/*.txt
+
+sudo service amazon-cloudwatch-agent.service start
