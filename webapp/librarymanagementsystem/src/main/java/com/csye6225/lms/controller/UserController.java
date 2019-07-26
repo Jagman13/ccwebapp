@@ -22,6 +22,10 @@ import javax.validation.Valid;
 
 @RestController
 public class UserController {
+    private final static Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private StatsDClient statsDClient;
 
 	@Autowired
 	private StatsDClient statsDClient;
@@ -36,8 +40,6 @@ public class UserController {
 
 	@Autowired
 	private Environment environment;
-
-
 
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {

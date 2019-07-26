@@ -29,6 +29,11 @@ import java.util.UUID;
 @RequestMapping("book")
 public class ImageController {
 
+    private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
+
+    @Autowired
+    private StatsDClient statsDClient;
+
     @Autowired
     private StatsDClient statsDClient;
 

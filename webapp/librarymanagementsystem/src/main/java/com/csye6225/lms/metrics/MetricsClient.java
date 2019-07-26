@@ -19,10 +19,11 @@ public class MetricsClient {
     private int metricsPort;
 
     @Bean
-public StatsDClient statsDClient(){
+    public StatsDClient statsDClient(){
 
-if(publishMetrics){
-    return new NonBlockingStatsDClient("csye6225",metricsHost,metricsPort);
-}return new NoOpStatsDClient();
-}
+        if(publishMetrics){
+            return new NonBlockingStatsDClient("csye6225",metricsHost,metricsPort);
+        }return new NoOpStatsDClient();
+    }
+
 }
