@@ -25,5 +25,4 @@ public class MetricsClient {
             return new NonBlockingStatsDClient("csye6225",metricsHost,metricsPort);
         }return new NoOpStatsDClient();
     }
-
 }

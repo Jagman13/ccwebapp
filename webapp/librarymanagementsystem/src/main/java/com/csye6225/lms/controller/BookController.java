@@ -29,11 +29,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("book")
 public class BookController {
-
-    static {
-
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-    }
     private final static Logger logger = LoggerFactory.getLogger(BookController.class);
 
     @Autowired
@@ -53,8 +48,8 @@ public class BookController {
 
     @GetMapping(value = "/")
     public ResponseEntity<List<Book>> findAll() {
-        statsDClient.incrementCounter("endpoint.allbook.http.get");
-        logger.info("Get all books endpoint request");
+        statsDClient.incrementCounter("endpoint.allbooks.http.get");
+        logger.info("Get all books");
         List<Book> books = bookService.findAll();
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod")) {
             for(Book book: books){
@@ -64,19 +59,19 @@ public class BookController {
                 }
             }
         }
-        String list= new Gson().toJson(books);
-        logger.info("Books returned: " + list );
-        logger.info("Get all books - Response code: " + HttpStatus.OK);
+        logger.info("Books returned: " + new Gson().toJson(books) );
+        logger.info("Get all books Successful- Response code: " + HttpStatus.OK);
         return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getBook(@PathVariable UUID id) {
         statsDClient.incrementCounter("endpoint.bookById.http.get");
+        logger.info("Searching book by id: " + id);
         Optional<Book> book = bookService.findById(id);
         Book existingBook= book.get();
         if (!book.isPresent()) {
-            logger.error("Book ID " +id + " not found. " );
+            logger.warn("Book ID " +id + " not found. " );
             logger.info("Get book by Id- Response code: " + HttpStatus.NOT_FOUND);
             throw new ResourceNotFoundException("Book Id not found");
         }
@@ -84,16 +79,16 @@ public class BookController {
         if(environment.getActiveProfiles()[0].equalsIgnoreCase("prod") && existingBook.getImageDetails()!=null) {
             existingBook.getImageDetails().setUrl(s3ImageService.getPreSignedUrl(existingBook.getImageDetails().getUrl()));
         }
+        logger.info("Book returned: " + new Gson().toJson(existingBook));
+        logger.info("Get book by Id Successful- Response code: " + HttpStatus.OK);
         return ResponseEntity.ok(existingBook);
     }
 
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
-
         Gson gson= new Gson();
         statsDClient.incrementCounter("endpoint.addBook.http.post");
-        logger.debug("Add book request " + gson.toJson(newBook));
-
+        logger.info("Add book request " + gson.toJson(newBook));
         newBook.setId(null);
         Book book = bookService.createBook(newBook);
         if (book == null) {
@@ -107,7 +102,7 @@ public class BookController {
                 .toUri();
         final HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
-        logger.info("Add Book- Response code: " + HttpStatus.CREATED);
+        logger.info("Add Book Successful- Response code: " + HttpStatus.CREATED);
         return new ResponseEntity<Book>(book,headers, HttpStatus.CREATED);
     }
 
@@ -115,7 +110,7 @@ public class BookController {
     public ResponseEntity<Object> updateBook(@Valid @RequestBody Book book) {
         Gson gson = new Gson();
         statsDClient.incrementCounter("endpoint.updateBook.http.put");
-
+        logger.info("Update book request " + gson.toJson(book));
         if (book.getId() == null) {
             logger.error("Validation failed for request: ID cannot be null "+ gson.toJson(book) );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -131,16 +126,17 @@ public class BookController {
             book.setImageDetails(b.get().getImageDetails());
         }
         bookService.createBook(book);
+        logger.info("Update Book Successful- Response code: " + HttpStatus.NO_CONTENT);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable UUID id) throws Exception{
-
         statsDClient.incrementCounter("endpoint.deleteBook.http.delete");
-
+        logger.info("Delete book by id:" + id);
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
+            logger.warn("Book ID " + id + " not found. " );
             throw new ResourceNotFoundException("Book Id not found");
         }
 
@@ -154,7 +150,7 @@ public class BookController {
         }
 
         bookService.deleteById(id);
+        logger.info("Delete Book Successful- Response code: " + HttpStatus.NO_CONTENT);
         return ResponseEntity.noContent().build();
     }
-
 }

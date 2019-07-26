@@ -55,7 +55,7 @@ public class BasicAuthEntryPoint extends BasicAuthenticationEntryPoint {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        setRealmName("assignment1");
+        setRealmName("ccwebapp");
         super.afterPropertiesSet();
     }
 
