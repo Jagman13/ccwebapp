@@ -22,7 +22,6 @@ import javax.validation.Valid;
 
 @RestController
 public class UserController {
-	private final static Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private StatsDClient statsDClient;
@@ -43,7 +42,6 @@ public class UserController {
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {
 		statsDClient.incrementCounter("endpoint.homepage.http.get");
-		logger.info("Get homepage endpoint request");
 		Date date = new Date();
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
@@ -55,7 +53,6 @@ public class UserController {
 	@PostMapping(value = "/user/register")
 	public ResponseEntity<String> register(@Valid @RequestBody User user) {
 		statsDClient.incrementCounter("endpoint.user.http.post");
-		logger.info("Post user endpoint request");
 		Gson gson= new Gson();
 		JsonObject jsonObject = new JsonObject();
 
@@ -76,7 +73,6 @@ public class UserController {
 		}else if(newuser != null) {
 
 			jsonObject.addProperty("message", "User already exists");
-			logger.error("User already exists");
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(gson.toJson(jsonObject));
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(gson.toJson(jsonObject));

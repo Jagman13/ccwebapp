@@ -28,7 +28,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("book")
 public class ImageController {
-    private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @Autowired
     private StatsDClient statsDClient;
@@ -48,15 +47,12 @@ public class ImageController {
     @PostMapping(value = "/{id}/image")
     public ResponseEntity<Image> saveImage(@PathVariable UUID id , @RequestPart("url") MultipartFile file, UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
         statsDClient.incrementCounter("endpoint.image.http.post");
-        logger.info("Post image endpoint request");
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
-            logger.error("Book Id not found");
             throw new ResourceNotFoundException("Book Id not found");
         }
 
         if(book.get().getImageDetails()!=null){
-            logger.error("Only one image can be added per book");
             throw new Exception("Only one image can be added per book");
         }
 
@@ -79,7 +75,6 @@ public class ImageController {
     @GetMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Image> getImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) {
         statsDClient.incrementCounter("endpoint.image.http.get");
-        logger.info("Get image endpoint request");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Image> image = imageService.getImage(idImage);
         Image existingImage= image.get();
@@ -93,7 +88,6 @@ public class ImageController {
     @DeleteMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Object> deleteImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) throws Exception {
         statsDClient.incrementCounter("endpoint.image.http.delete");
-        logger.info("Delete image endpoint request");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
         Image image = book.get().getImageDetails();
@@ -112,7 +106,6 @@ public class ImageController {
     @PutMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Object> putImage(@PathVariable UUID idBook ,@PathVariable UUID idImage,@RequestPart("url") MultipartFile file) throws Exception {
         statsDClient.incrementCounter("endpoint.image.http.put");
-        logger.info("Put image endpoint request");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
         String fileNameNew = file.getOriginalFilename();

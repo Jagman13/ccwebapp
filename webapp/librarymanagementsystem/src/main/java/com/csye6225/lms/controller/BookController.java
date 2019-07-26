@@ -63,11 +63,9 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getBook(@PathVariable UUID id) {
         statsDClient.incrementCounter("endpoint.book.http.get");
-        logger.info("Get book endpoint request");
         Optional<Book> book = bookService.findById(id);
         Book existingBook= book.get();
         if (!book.isPresent()) {
-            logger.error("Book Id not found");
             throw new ResourceNotFoundException("Book Id not found");
         }
 
@@ -80,11 +78,9 @@ public class BookController {
     @PostMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook , UriComponentsBuilder ucBuilder) throws URISyntaxException , Exception{
         statsDClient.incrementCounter("endpoint.book.http.post");
-        logger.info("Post book endpoint request");
         newBook.setId(null);
         Book book = bookService.createBook(newBook);
         if (book == null) {
-            logger.error("Internal Server error");
             throw new Exception("Internal Server error");
 
         }
@@ -102,15 +98,12 @@ public class BookController {
     @PutMapping(value = "/", produces = "application/json", consumes = "application/json")
     public ResponseEntity<Object> updateBook(@Valid @RequestBody Book book) {
         statsDClient.incrementCounter("endpoint.book.http.post");
-        logger.info("Put endpoint request");
         if (book.getId() == null) {
-            logger.error("Book Id not found");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new RestApiError("Validation Failed", "Id must be passed"));
         }
         Optional<Book> b = bookService.findById(book.getId());
         if (!b.isPresent()) {
-            logger.error("Put Book bad request");
             return ResponseEntity.badRequest().build();
         }
         if(null!=b.get().getImageDetails())
@@ -124,10 +117,8 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteBook(@PathVariable UUID id) throws Exception{
         statsDClient.incrementCounter("endpoint.book.http.delete");
-        logger.info("Delete book endpoint request");
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
-            logger.error("Book Id not found");
             throw new ResourceNotFoundException("Book Id not found");
         }
 
