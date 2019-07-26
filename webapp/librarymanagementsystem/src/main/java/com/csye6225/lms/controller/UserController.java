@@ -5,6 +5,9 @@ import java.util.Date;
 import com.csye6225.lms.dao.UserRepository;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -19,6 +22,10 @@ import javax.validation.Valid;
 
 @RestController
 public class UserController {
+    private final static Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private StatsDClient statsDClient;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -30,8 +37,6 @@ public class UserController {
 
 	@Autowired
 	private Environment environment;
-
-
 
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {

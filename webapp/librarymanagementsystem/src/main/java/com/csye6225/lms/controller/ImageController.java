@@ -1,5 +1,8 @@
 package com.csye6225.lms.controller;
 import com.csye6225.lms.service.AmazonS3ImageService;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +28,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("book")
 public class ImageController {
+
+    private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
+
+    @Autowired
+    private StatsDClient statsDClient;
 
     @Autowired
     private BookService bookService;
