@@ -3,6 +3,7 @@ import com.csye6225.lms.dao.UserRepository;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
 import com.google.gson.Gson;
+import com.timgroup.statsd.StatsDClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +50,10 @@ public class UserControllerUnitTest {
 
     @Autowired
     private Gson gson;
+
+    @MockBean
+    private StatsDClient statsDClient;
+
 
     @Before
     public void setUp() {

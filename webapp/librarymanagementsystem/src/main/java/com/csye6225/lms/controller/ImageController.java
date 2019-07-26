@@ -1,5 +1,8 @@
 package com.csye6225.lms.controller;
 import com.csye6225.lms.service.AmazonS3ImageService;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,8 +26,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("bookAWS")
+@RequestMapping("book")
 public class ImageController {
+
+    @Autowired
+    private StatsDClient statsDClient;
 
     @Autowired
     private BookService bookService;
@@ -40,6 +46,7 @@ public class ImageController {
 
     @PostMapping(value = "/{id}/image")
     public ResponseEntity<Image> saveImage(@PathVariable UUID id , @RequestPart("url") MultipartFile file, UriComponentsBuilder ucBuilder) throws URISyntaxException, Exception {
+        statsDClient.incrementCounter("endpoint.image.http.post");
         Optional<Book> book = bookService.findById(id);
         if (!book.isPresent()) {
             throw new ResourceNotFoundException("Book Id not found");
@@ -67,6 +74,7 @@ public class ImageController {
 
     @GetMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Image> getImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) {
+        statsDClient.incrementCounter("endpoint.image.http.get");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Image> image = imageService.getImage(idImage);
         Image existingImage= image.get();
@@ -79,6 +87,7 @@ public class ImageController {
 
     @DeleteMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Object> deleteImage(@PathVariable UUID idBook ,@PathVariable UUID idImage) throws Exception {
+        statsDClient.incrementCounter("endpoint.image.http.delete");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
         Image image = book.get().getImageDetails();
@@ -96,6 +105,7 @@ public class ImageController {
 
     @PutMapping(value = "/{idBook}/image/{idImage}")
     public ResponseEntity<Object> putImage(@PathVariable UUID idBook ,@PathVariable UUID idImage,@RequestPart("url") MultipartFile file) throws Exception {
+        statsDClient.incrementCounter("endpoint.image.http.put");
         imageService.checkBookImageMapping(idBook,idImage);
         Optional<Book> book = bookService.findById(idBook);
         String fileNameNew = file.getOriginalFilename();

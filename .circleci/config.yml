@@ -5,7 +5,7 @@ jobs:
       branches:
         only:
           - master
-          - assignment5
+          - assignment6
     docker:
       - image: circleci/python:3.6.5
     steps:
