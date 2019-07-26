@@ -7,8 +7,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-
-
 import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.Image;
@@ -25,12 +23,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("book")
 public class ImageController {
-
-    static {
-
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-    }
-
     private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @Autowired

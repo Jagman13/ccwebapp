@@ -1,18 +1,13 @@
 package com.csye6225.lms.service;
 
 import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.csye6225.lms.controller.ImageController;
 import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
-import com.csye6225.lms.pojo.Image;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,22 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 @Service
 public class AmazonS3ImageService {
-
-    static {
-
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-    }
-
     private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
-
 
     private AmazonS3 amazonS3;
 
