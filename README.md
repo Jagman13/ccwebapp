@@ -80,5 +80,6 @@ Circleci used for the continuous deployment.
         only:
           - master
           - assignment5 `
-
-
+        
+## CloudWatch Agent
+CloudWatch agent collects custom metrics for every API endpoint using StatsD protocol.

@@ -21,19 +21,19 @@
       "Subnet1": {
         "Type": "AWS::EC2::Subnet::Id",
         "Description": "Subnet to launch the instance into.",
-        "Default" :  "subnet-c6e9bc9a" 
+        "Default" :  "subnet-c6e9bc9a"
       },
 
       "Subnet2": {
         "Type": "AWS::EC2::Subnet::Id",
         "Description": "Subnet to launch the instance into.",
-        "Default" :  "subnet-86a3ebe1" 
+        "Default" :  "subnet-86a3ebe1"
       },
 
       "Subnet3": {
         "Type": "AWS::EC2::Subnet::Id",
         "Description": "Subnet to launch the instance into.",
-        "Default" :  "subnet-6bfaad45" 
+        "Default" :  "subnet-6bfaad45"
       },
 
 
@@ -81,45 +81,45 @@
         "Properties" : {
           "GroupName" : "csye6225-webapp",
           "GroupDescription" : "webapp security group",
-          "VpcId" : {"Ref": "VPC"},    
+          "VpcId" : {"Ref": "VPC"},
           "SecurityGroupIngress" : [{
-            "IpProtocol" : "tcp", 
+            "IpProtocol" : "tcp",
             "FromPort": 22,
             "ToPort" : 22,
             "CidrIp" : "0.0.0.0/0"
           },
           {
-            "IpProtocol" : "tcp",                    
+            "IpProtocol" : "tcp",
             "FromPort": 80,
-            "ToPort" : 80,                    
+            "ToPort" : 80,
             "CidrIp" : "0.0.0.0/0"
 
           },
           {
-            "IpProtocol" : "tcp",                    
+            "IpProtocol" : "tcp",
             "FromPort": 8080,
-            "ToPort" : 8080,                    
+            "ToPort" : 8080,
             "CidrIp" : "0.0.0.0/0"
 
           },
           {
-            "IpProtocol" : "tcp",                    
+            "IpProtocol" : "tcp",
             "FromPort": 443,
-            "ToPort" : 443,                    
+            "ToPort" : 443,
             "CidrIp" : "0.0.0.0/0"
 
           },
           {
-            "IpProtocol" : "tcp",                    
+            "IpProtocol" : "tcp",
             "FromPort": 3306,
-            "ToPort" : 3306,                    
+            "ToPort" : 3306,
             "CidrIp" : "0.0.0.0/0"
 
-          }            
+          }
         ]
         }
       },
-      
+
       "DBSecurityGroup": {
         "Type": "AWS::RDS::DBSecurityGroup",
         "Properties": {
@@ -161,40 +161,41 @@
               "InstanceSecurityGroup",
               "GroupId"
             ]
-          }],
-          "SubnetId" : {"Ref" : "Subnet1" },
-          "UserData": {
-            "Fn::Base64": {
-              "Fn::Join": ["\n",
-               [ "#!/bin/bash -xe ",
-                "sudo echo SPRING_PROFILES_ACTIVE=prod | sudo tee -a /usr/lib/systemd/system/envVariables",
-                "sudo echo SPRING_DATASOURCE_USERNAME=csye6225master |  sudo tee -a /usr/lib/systemd/system/envVariables",
-                "sudo echo SPRING_DATASOURCE_PASSWORD=csye6225password |  sudo tee -a /usr/lib/systemd/system/envVariables",
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "sudo echo SPRING_DATASOURCE_URL=jdbc:mysql://",
-                      {
-                        "Fn::GetAtt": [
-                          "DBInstance",
-                          "Endpoint.Address"
+            }],
+            "SubnetId" : {"Ref" : "Subnet1" },
+            "UserData": {
+              "Fn::Base64": {
+                "Fn::Join": ["\n",
+                  [ "#!/bin/bash -xe ",
+                    "sudo echo SPRING_PROFILES_ACTIVE=prod | sudo tee -a /usr/lib/systemd/system/envVariables",
+                    "sudo echo SPRING_DATASOURCE_USERNAME=csye6225master |  sudo tee -a /usr/lib/systemd/system/envVariables",
+                    "sudo echo SPRING_DATASOURCE_PASSWORD=csye6225password |  sudo tee -a /usr/lib/systemd/system/envVariables",
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "sudo echo SPRING_DATASOURCE_URL=jdbc:mysql://",
+                          {
+                            "Fn::GetAtt": [
+                              "DBInstance",
+                              "Endpoint.Address"
+                            ]
+                          },
+                          ":3306/csye6225 | sudo tee -a /usr/lib/systemd/system/envVariables"
                         ]
-                      },
-                      ":3306/csye6225 | sudo tee -a /usr/lib/systemd/system/envVariables"
-                    ]
-                  ]
-                },
-                {"Fn::Join": [
-                  "",
-                  ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3ImageBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]} ,
-
-                "sudo systemctl daemon-reload",
-                "sudo systemctl restart tomcat.service"
-
-              ] ]}},
-            }
-          },
+                      ]
+                    },
+                    {"Fn::Join": [
+                      "",
+                      ["sudo echo S3_BUCKET_NAME=",{"Ref":"S3ImageBucket"}, " | sudo tee -a /usr/lib/systemd/system/envVariables"]]} ,
+                      "sudo systemctl daemon-reload",
+                      "sudo systemctl restart tomcat.service",
+                      "cp /tmp/cloudwatchconfig.json /home/centos/",
+                      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/centos/cloudwatchconfig.json -s",
+                      "sudo service amazon-cloudwatch-agent.service start"
+                      ] ]}}
+                    }
+                  },
 
           "DBSubnetGroup": {
             "Type": "AWS::RDS::DBSubnetGroup",
@@ -223,7 +224,7 @@
               "VPCSecurityGroups": [{"Ref":"DBSecurityGroup"}]
 
             }
-          } , 
+          } ,
 
           "CodeDeployEC2S3" : {
             "Type" : "AWS::IAM::ManagedPolicy",
@@ -374,7 +375,8 @@
            },
            "ManagedPolicyArns":[
             {"Ref" : "CodeDeployEC2S3"},
-            {"Ref" : "ImageEC2S3"}
+            {"Ref" : "ImageEC2S3"},
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
           ],
            "Path": "/",
            "RoleName": "CodeDeployEC2ServiceRole"
@@ -422,7 +424,7 @@
           }],
           "ServiceRoleArn" : {
             "Fn::GetAtt" : [
-              "CodeDeployServiceRole", 
+              "CodeDeployServiceRole",
               "Arn"
             ]
           }

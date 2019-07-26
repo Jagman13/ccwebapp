@@ -9,12 +9,16 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
+import com.csye6225.lms.controller.ImageController;
 import com.csye6225.lms.exception.ResourceNotFoundException;
 import com.csye6225.lms.pojo.Book;
 import com.csye6225.lms.pojo.Image;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +30,14 @@ import java.net.URL;
 
 @Service
 public class AmazonS3ImageService {
+
+    static {
+
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+    }
+
+    private final static Logger logger = LoggerFactory.getLogger(ImageController.class);
+
 
     private AmazonS3 amazonS3;
 
@@ -43,6 +55,7 @@ public class AmazonS3ImageService {
 
     public String uploadImageToS3(Book book, MultipartFile multipartFile) throws IOException {
         // File fileToUpload = convertMultiPartToFile(multipartFile);
+        logger.info("Going to upload image in S3 bucket");
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentType("image");
         String key = book.getId()+ "_" + multipartFile.getOriginalFilename();
@@ -59,6 +72,8 @@ public class AmazonS3ImageService {
 
     public String getPreSignedUrl(String key){
         if(!imageExistsInS3(key)){
+            logger.error("Image doesn't exist :" +key);
+            logger.info("Get image from S3- Response code: " + HttpStatus.NOT_FOUND);
             throw new ResourceNotFoundException("Image not found in S3 bucket");
         }
         /* get signed URL (valid for 2 minutes) */
@@ -66,6 +81,7 @@ public class AmazonS3ImageService {
                 .withMethod(HttpMethod.GET)
                 .withExpiration(DateTime.now().plusMinutes(2).toDate());
         URL signedUrl = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+        logger.info("Signed Url for the image : " +signedUrl.toString());
         return signedUrl.toString();
     }
 
