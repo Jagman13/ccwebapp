@@ -5,7 +5,7 @@
  help_me()
 {
 	  echo "Usage:-"
-	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname> <S3CodeDeployBucket> <S3ImageBucket> <User>"
+	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname> <S3CodeDeployBucket> <S3ImageBucket> <User> <snstopicname>"
 	  exit
 }
 
@@ -16,8 +16,9 @@
 	CODEDEPLOYBUCKET=$5
 	S3IMAGEBUCKET=$6
 	USER=$7
+	SNSTOPICNAME=$8
 
-	if [ $# -ne 7 ]
+	if [ $# -ne 8 ]
 	then 
 		echo -e "You are missing some parameters"
 		help_me
@@ -62,6 +63,7 @@ aws cloudformation create-stack --stack-name $APP_STACK_NAME --template-body fil
  ParameterKey=S3CodeDeployBucket,ParameterValue=$CODEDEPLOYBUCKET\
  ParameterKey=S3ImageBucket,ParameterValue=$S3IMAGEBUCKET\
  ParameterKey=CFNUser,ParameterValue=$USER\
+ ParameterKey=SNSName,ParameterValue=$SNSTOPICNAME\
  --capabilities CAPABILITY_NAMED_IAM
 
 
