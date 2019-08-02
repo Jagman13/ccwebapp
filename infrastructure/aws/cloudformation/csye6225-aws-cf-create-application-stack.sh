@@ -5,7 +5,7 @@
  help_me()
 {
 	  echo "Usage:-"
-	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname> <S3CodeDeployBucket> <S3ImageBucket> <User> <snstopicname>"
+	  echo "$0 <Application-Stack-Name> <Network-Stack-Name> <AMI-id> <Keyname> <S3CodeDeployBucket> <S3ImageBucket> <User> <snstopicarn>"
 	  exit
 }
 
@@ -16,7 +16,7 @@
 	CODEDEPLOYBUCKET=$5
 	S3IMAGEBUCKET=$6
 	USER=$7
-	SNSTOPICNAME=$8
+	SNSTOPICARN=$8
 
 	if [ $# -ne 8 ]
 	then 
@@ -63,7 +63,7 @@ aws cloudformation create-stack --stack-name $APP_STACK_NAME --template-body fil
  ParameterKey=S3CodeDeployBucket,ParameterValue=$CODEDEPLOYBUCKET\
  ParameterKey=S3ImageBucket,ParameterValue=$S3IMAGEBUCKET\
  ParameterKey=CFNUser,ParameterValue=$USER\
- ParameterKey=SNSName,ParameterValue=$SNSTOPICNAME\
+ ParameterKey=SNSTOPICARN,ParameterValue=$SNSTOPICARN\
  --capabilities CAPABILITY_NAMED_IAM
 
 
