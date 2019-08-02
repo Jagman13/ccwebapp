@@ -1,14 +1,23 @@
 package com.csye6225.lms.controller;
 
 import java.util.Date;
+import java.util.logging.Handler;
 
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.csye6225.lms.dao.UserRepository;
+import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
 import com.timgroup.statsd.StatsDClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +45,9 @@ public class UserController {
 
 	@Autowired
 	private Environment environment;
+
+	@Value("${aws.sns.topic.ARN}")
+	private String topicArn;
 
 	@GetMapping(value = "/")
 	public ResponseEntity<String> authenticate() {
@@ -83,5 +95,27 @@ public class UserController {
 		}
 		logger.info("User Registered Response code: " + HttpStatus.CREATED);
 		return ResponseEntity.status(HttpStatus.CREATED).body(gson.toJson(jsonObject));
+	}
+
+	@PostMapping(value = "/reset")
+	public ResponseEntity<Object> resetPassword(@RequestParam(name = "email") String email){
+		if (email.isEmpty()){
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new RestApiError("Validation Failed", "Please enter a valid email address"));
+		}
+		User user=userRepository.findByEmail(email);
+		if (user==null){
+			logger.info("User does not exist in the system");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new RestApiError("Validation Failed", "User does not exist in the system"));
+		}
+		// Publish a message to an Amazon SNS topic.
+		final PublishRequest publishRequest = new PublishRequest(topicArn, email);
+		AmazonSNS snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
+		final PublishResult publishResponse = snsClient.publish(publishRequest);
+
+		// Print the MessageId of the message.
+		System.out.println("MessageId: " + publishResponse.getMessageId());
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
