@@ -10,6 +10,7 @@ import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.csye6225.lms.dao.UserRepository;
+import com.csye6225.lms.pojo.RestApiError;
 import com.csye6225.lms.pojo.User;
 import com.csye6225.lms.service.CustomUserDetailsService;
 import com.timgroup.statsd.StatsDClient;
@@ -97,16 +98,20 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/reset")
-	public ResponseEntity<String> resetPassword(){
+	public ResponseEntity<Object> resetPassword(@RequestParam(name = "email") String email){
+		if(email == null){
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new RestApiError("Validation Failed", "Pass email in query parameter like '?email=value'"));
+		}
 		// Publish a message to an Amazon SNS topic.
 		final String msg = "If you receive this message, publishing a message to an Amazon SNS topic works.";
-		final PublishRequest publishRequest = new PublishRequest(topicArn, msg);
+		final PublishRequest publishRequest = new PublishRequest(topicArn, email);
 		AmazonSNS snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
 		final PublishResult publishResponse = snsClient.publish(publishRequest);
 
 // Print the MessageId of the message.
 		System.out.println("MessageId: " + publishResponse.getMessageId());
 		System.out.println("Reset api called");
-		return null;
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
