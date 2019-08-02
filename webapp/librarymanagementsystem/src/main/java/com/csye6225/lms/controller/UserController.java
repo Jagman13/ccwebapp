@@ -99,19 +99,23 @@ public class UserController {
 
 	@PostMapping(value = "/reset")
 	public ResponseEntity<Object> resetPassword(@RequestParam(name = "email") String email){
-		if(email == null){
+		if (email.isEmpty()){
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new RestApiError("Validation Failed", "Pass email in query parameter like '?email=value'"));
+					.body(new RestApiError("Validation Failed", "Please enter a valid email address"));
+		}
+		User user=userRepository.findByEmail(email);
+		if (user==null){
+			logger.info("User does not exist in the system");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new RestApiError("Validation Failed", "User does not exist in the system"));
 		}
 		// Publish a message to an Amazon SNS topic.
-		final String msg = "If you receive this message, publishing a message to an Amazon SNS topic works.";
 		final PublishRequest publishRequest = new PublishRequest(topicArn, email);
 		AmazonSNS snsClient = AmazonSNSClientBuilder.standard().withCredentials(new InstanceProfileCredentialsProvider(false)).build();
 		final PublishResult publishResponse = snsClient.publish(publishRequest);
 
-// Print the MessageId of the message.
+		// Print the MessageId of the message.
 		System.out.println("MessageId: " + publishResponse.getMessageId());
-		System.out.println("Reset api called");
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
