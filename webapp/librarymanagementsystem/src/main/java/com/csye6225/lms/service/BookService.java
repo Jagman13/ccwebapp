@@ -30,4 +30,8 @@ public class BookService {
     public void deleteById(UUID id){
         bookRepository.deleteById(id);
     }
+
+    public void deleteAll(){
+        bookRepository.deleteAll();
+    }
 }

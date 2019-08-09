@@ -197,7 +197,7 @@
                 "sudo systemctl daemon-reload",
                 "sudo systemctl restart tomcat.service",
                 "cp /tmp/cloudwatchconfig.json /home/centos/",
-                "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/centos/cloudwatch-config.json -s",
+                "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/centos/cloudwatchconfig.json -s",
                 "sudo service amazon-cloudwatch-agent.service start"
 
               ] ]}},
