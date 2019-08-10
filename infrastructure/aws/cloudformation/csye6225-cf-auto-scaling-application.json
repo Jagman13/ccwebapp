@@ -102,6 +102,12 @@
                   "FromPort":8080,
                   "ToPort":8080,
                   "CidrIp":"0.0.0.0/0"
+               },
+               {
+                  "IpProtocol":"tcp",
+                  "FromPort":223,
+                  "ToPort":223,
+                  "CidrIp":"0.0.0.0/0"
                }
             ]
          }
@@ -343,7 +349,7 @@
             "Statistic": "Average",
             "Period": "180",
             "EvaluationPeriods": "2",
-            "Threshold": "90",
+            "Threshold": "5",
             "AlarmActions": [
                { "Ref": "WebServerScaleUpPolicy" }
             ],
@@ -369,7 +375,7 @@
             "Statistic": "Average",
             "Period": "300",
             "EvaluationPeriods": "2",
-            "Threshold": "90",
+            "Threshold": "3",
             "AlarmActions": [
                { "Ref": "WebServerScaleDownPolicy" }
             ],

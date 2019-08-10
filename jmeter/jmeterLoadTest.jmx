@@ -129,8 +129,8 @@ new File(FileServer.getFileServer().getBaseDir()+&quot;/email.csv&quot;).delete(
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">${__P(domain)}</stringProp>
-          <stringProp name="HTTPSampler.port">443</stringProp>
+          <stringProp name="HTTPSampler.domain">csye6225-su19-kaurj.me</stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/librarymanagementsystem-0.0.1-SNAPSHOT/user/register</stringProp>
@@ -228,7 +228,7 @@ p.close();f.close();</stringProp>
       </ThreadGroup>
       <hashTree>
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
-          <stringProp name="filename">./email.csv</stringProp>
+          <stringProp name="filename">/home/jagman/csye6225/dev/ccwebapp/jmeter/email.csv</stringProp>
           <stringProp name="fileEncoding"></stringProp>
           <stringProp name="variableNames">email</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
@@ -255,8 +255,8 @@ p.close();f.close();</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">${__P(domain)}</stringProp>
-          <stringProp name="HTTPSampler.port">443</stringProp>
+          <stringProp name="HTTPSampler.domain">csye6225-su19-kaurj.me</stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/librarymanagementsystem-0.0.1-SNAPSHOT/book/</stringProp>
@@ -273,7 +273,7 @@ p.close();f.close();</stringProp>
           <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="true">
             <collectionProp name="AuthManager.auth_list">
               <elementProp name="" elementType="Authorization">
-                <stringProp name="Authorization.url">http://${__P(domain)}/librarymanagementsystem-0.0.1-SNAPSHOT/book/</stringProp>
+                <stringProp name="Authorization.url">https://csye6225-su19-kaurj.me/librarymanagementsystem-0.0.1-SNAPSHOT/book/</stringProp>
                 <stringProp name="Authorization.username">${email}</stringProp>
                 <stringProp name="Authorization.password">Password1@A</stringProp>
                 <stringProp name="Authorization.domain"></stringProp>
@@ -338,8 +338,8 @@ p.close();f.close();</stringProp>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="upload image" enabled="true">
           <elementProp name="HTTPsampler.Files" elementType="HTTPFileArgs">
             <collectionProp name="HTTPFileArgs.files">
-              <elementProp name="Panda.jpg" elementType="HTTPFileArg">
-                <stringProp name="File.path">Panda.jpg</stringProp>
+              <elementProp name="/home/jagman/csye6225/dev/ccwebapp/jmeter/Panda.jpg" elementType="HTTPFileArg">
+                <stringProp name="File.path">/home/jagman/csye6225/dev/ccwebapp/jmeter/Panda.jpg</stringProp>
                 <stringProp name="File.paramname">url</stringProp>
                 <stringProp name="File.mimetype">multipart/form-data</stringProp>
               </elementProp>
@@ -348,8 +348,8 @@ p.close();f.close();</stringProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">${__P(domain)}</stringProp>
-          <stringProp name="HTTPSampler.port">443</stringProp>
+          <stringProp name="HTTPSampler.domain">csye6225-su19-kaurj.me</stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/librarymanagementsystem-0.0.1-SNAPSHOT/book/${bookid}/image</stringProp>
