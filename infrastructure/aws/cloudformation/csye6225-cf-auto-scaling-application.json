@@ -52,8 +52,13 @@
          "Type":"String"
       },
 
-      "domainName":{
+      "hostedId":{
          "Type":"String"
+
+      },
+
+      "domainName" :{
+    	 "Type":"String"
 
       },
 
@@ -96,12 +101,6 @@
                   "IpProtocol":"tcp",
                   "FromPort":8080,
                   "ToPort":8080,
-                  "SourceSecurityGroupId" : {"Ref":"loadbalancerSecurityGroup"}
-               },
-               {
-                  "IpProtocol":"tcp",
-                  "FromPort":22,
-                  "ToPort":22,
                   "CidrIp":"0.0.0.0/0"
                }
             ]
@@ -298,9 +297,9 @@
             "VPCZoneIdentifier" : [{"Ref" : "Subnet1"}, {"Ref" : "Subnet2"}],
             "LaunchConfigurationName" : {"Ref": "launchConfiguration"},
             "Cooldown" : 60,
-            "MaxSize" : "7",
-            "MinSize" : "3",
-            "DesiredCapacity" : "3",
+            "MaxSize" : "4",
+            "MinSize" : "2",
+            "DesiredCapacity" : "2",
             "TargetGroupARNs" : [ {"Ref":"myTargetGroup"}],
             "Tags":[
                {
@@ -342,7 +341,7 @@
             "MetricName": "CPUUtilization",
             "Namespace": "AWS/EC2",
             "Statistic": "Average",
-            "Period": "300",
+            "Period": "180",
             "EvaluationPeriods": "2",
             "Threshold": "90",
             "AlarmActions": [
@@ -372,7 +371,7 @@
             "EvaluationPeriods": "2",
             "Threshold": "90",
             "AlarmActions": [
-               { "Ref": "WebServerScaleUpPolicy" }
+               { "Ref": "WebServerScaleDownPolicy" }
             ],
             "Dimensions": [
                {
@@ -427,7 +426,7 @@
          "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
          "Properties" : {
             "HealthCheckIntervalSeconds" : 30,
-            "HealthCheckPath" : "/",
+            "HealthCheckPath" : "/librarymanagementsystem-0.0.1-SNAPSHOT",
             "HealthCheckPort" : "8080",
             "HealthCheckProtocol" : "HTTP",
             "HealthCheckTimeoutSeconds" : 7,
@@ -439,7 +438,7 @@
             "UnhealthyThresholdCount" : 5,
             "VpcId" : {"Ref": "VPC"},
             "Matcher":{
-               "HttpCode" : "401"
+               "HttpCode" : "200,302"
             }
          }
       },
@@ -453,8 +452,8 @@
                "HostedZoneId":{"Fn::GetAtt":["myLoadBalancer","CanonicalHostedZoneID"]},
                "EvaluateTargetHealth":true
             },
-            "Name" : "csye6225-su19-kaurj.me.",
-            "HostedZoneId" : {"Ref":"domainName"},
+            "Name" :{"Ref":"domainName"},
+            "HostedZoneId" : {"Ref":"hostedId"},
             "Type" : "A"
         }
       },

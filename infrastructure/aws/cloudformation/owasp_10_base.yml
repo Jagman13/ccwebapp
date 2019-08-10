@@ -67,7 +67,7 @@ Parameters:
   maxExpectedBodySize:
     Type: Number
     Description: Maximum number of bytes allowed in the body of the request. If you do not plan to allow large uploads, set it to the largest payload value that makes sense for your web application. Accepting unnecessarily large values can cause performance issues, if large payloads are used as an attack vector against your web application.
-    Default: 4096
+    Default: 100000
   maxExpectedCookieSize:
     Type: Number
     Description: Maximum number of bytes allowed in the cookie header. The maximum size should be less than 4096, the size is determined by the amount of information your web application stores in cookies. If you only pass a session token via cookies, set the size to no larger than the serialized size of the session token and cookie metadata.
@@ -80,6 +80,11 @@ Parameters:
     Type: Number
     Description: The size in bytes of the CSRF token value. For example if it's a canonically formatted UUIDv4 value the expected size would be 36 bytes/ASCII characters
     Default: 36
+  LoadBalancer:
+    Type: String
+    Description: LoadBalancer arn
+    Default: arn:aws:elasticloadbalancing:us-east-1:929363290540:loadbalancer/app/myLoadBalancer/8c8188a1252fd009
+
 
 ## ::METADATA::
 ## CloudFormation parameter UI definitions
@@ -189,7 +194,7 @@ Resources:
             Data: cookie
           TextTransformation: HTML_ENTITY_DECODE
   wafgSQLiSet:
-    Type: AWS::WAF::SqlInjectionMatchSet
+    Type: AWS::WAFRegional::SqlInjectionMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'detect-sqli']]
@@ -231,7 +236,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrSQLiSet
   wafgSQLiRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'mitigatesqli']]
@@ -265,7 +270,7 @@ Resources:
           TargetString: .TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
           TextTransformation: URL_DECODE
   wafgAuthTokenStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-auth-tokens']]
@@ -293,7 +298,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrAuthTokenStringSet
   wafgAuthTokenRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'badauthtokens']]
@@ -341,7 +346,7 @@ Resources:
             Data: cookie
           TextTransformation: HTML_ENTITY_DECODE
   wafgXSSSet:
-    Type: AWS::WAF::XssMatchSet
+    Type: AWS::WAFRegional::XssMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'detect-xss']]
@@ -383,7 +388,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrXSSSet
   wafgXSSRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'mitigatexss']]
@@ -445,7 +450,7 @@ Resources:
           TargetString: ://
           TextTransformation: HTML_ENTITY_DECODE
   wafgPathsStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-rfi-lfi-traversal']]
@@ -501,7 +506,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrPathsStringSet
   wafgPathsRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'detectrfilfi']]
@@ -528,7 +533,7 @@ Resources:
           TargetString: !Ref adminUrlPrefix
           TextTransformation: URL_DECODE
   wafgAdminUrlStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-admin-url']]
@@ -547,7 +552,7 @@ Resources:
         - Type: IPV4
           Value: !Ref adminRemoteCidr
   wafgAdminRemoteAddrIpSet:
-    Type: AWS::WAF::IPSet
+    Type: AWS::WAFRegional::IPSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-admin-remote-ip']]
@@ -568,7 +573,7 @@ Resources:
           Negated: true
           DataId: !Ref wafrAdminRemoteAddrIpSet
   wafgAdminAccessRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'detectadminaccess']]
@@ -632,7 +637,7 @@ Resources:
           TargetString: safe_mode=
           TextTransformation: URL_DECODE
   wafgPHPInsecureQSStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-php-insecure-var-refs']]
@@ -694,7 +699,7 @@ Resources:
           TargetString: /
           TextTransformation: URL_DECODE
   wafgPHPInsecureURIStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-php-insecure-uri']]
@@ -723,7 +728,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrPHPInsecureURIStringSet
   wafgPHPInsecureRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'detectphpinsecure']]
@@ -768,7 +773,7 @@ Resources:
           ComparisonOperator: GT
           Size: !Ref maxExpectedCookieSize
   wafgSizeRestrictionSet:
-    Type: AWS::WAF::SizeConstraintSet
+    Type: AWS::WAFRegional::SizeConstraintSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'size-restrictions']]
@@ -805,7 +810,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrSizeRestrictionSet
   wafgSizeRestrictionRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'restrictsizes']]
@@ -831,7 +836,7 @@ Resources:
           TargetString: post
           TextTransformation: LOWERCASE
   wafgCSRFMethodStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-csrf-method']]
@@ -854,7 +859,7 @@ Resources:
           ComparisonOperator: EQ
           Size: !Ref csrfExpectedSize
   wafgCSRFTokenSizeConstraint:
-    Type: AWS::WAF::SizeConstraintSet
+    Type: AWS::WAFRegional::SizeConstraintSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-csrf-token']]
@@ -879,7 +884,7 @@ Resources:
           Negated: true
           DataId: !Ref wafrCSRFTokenSizeConstraint
   wafgCSRFRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'enforcecsrf']]
@@ -943,7 +948,7 @@ Resources:
           TargetString: .backup
           TextTransformation: LOWERCASE
   wafgServerSideIncludeStringSet:
-    Type: AWS::WAF::ByteMatchSet
+    Type: AWS::WAFRegional::ByteMatchSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-ssi']]
@@ -999,7 +1004,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrServerSideIncludeStringSet
   wafgServerSideIncludeRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'detectssi']]
@@ -1030,7 +1035,7 @@ Resources:
         - Type: IPV4
           Value: 127.0.0.1/32
   wafgBlacklistIpSet:
-    Type: AWS::WAF::IPSet
+    Type: AWS::WAFRegional::IPSet
     Condition: isGlobal
     Properties:
       Name: !Join ['-', [!Ref stackPrefix, 'match-blacklisted-ips']]
@@ -1056,7 +1061,7 @@ Resources:
           Negated: false
           DataId: !Ref wafrBlacklistIpSet
   wafgBlacklistIpRule:
-    Type: AWS::WAF::Rule
+    Type: AWS::WAFRegional::Rule
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'blacklistedips']]
@@ -1107,10 +1112,6 @@ Resources:
           RuleId: !Ref wafrPHPInsecureRule
         - Action:
             Type: !Ref ruleAction
-          Priority: 80
-          RuleId: !Ref wafrCSRFRule
-        - Action:
-            Type: !Ref ruleAction
           Priority: 90
           RuleId: !Ref wafrServerSideIncludeRule
         - Action:
@@ -1118,7 +1119,7 @@ Resources:
           Priority: 100
           RuleId: !Ref wafrAdminAccessRule
   wafgOwaspACL:
-    Type: AWS::WAF::WebACL
+    Type: AWS::WAFRegional::WebACL
     Condition: isGlobal
     Properties:
       MetricName: !Join ['', [!Ref stackPrefix, 'owaspacl']]
@@ -1156,24 +1157,19 @@ Resources:
           RuleId: !Ref wafgPHPInsecureRule
         - Action:
             Type: !Ref ruleAction
-          Priority: 80
-          RuleId: !Ref wafgCSRFRule
-        - Action:
-            Type: !Ref ruleAction
           Priority: 90
           RuleId: !Ref wafgServerSideIncludeRule
         - Action:
             Type: !Ref ruleAction
           Priority: 100
           RuleId: !Ref wafgAdminAccessRule
-
-
   MyWebACLAssociation:
-    Type: AWS::WAFRegional::WebACLAssociation
-    DependsOn: wafrOwaspACL
+    Type: "AWS::WAFRegional::WebACLAssociation"
     Properties:
-      WebACLId: !Ref wafrOwaspACL
-      ResourceArn: !ImportValue csye6225-load-balancer
+      ResourceArn:
+        Fn::ImportValue: csye6225-load-balancer
+      WebACLId:
+        Ref: wafrOwaspACL
 
 ## ::OUTPUTS::
 ## Outputs useful in other templates
@@ -1228,3 +1224,5 @@ Outputs:
     Value: !If [ isRegional, !Ref wafrAdminRemoteAddrIpSet, !Ref wafgAdminRemoteAddrIpSet ]
   wafIpBlacklist:
     Value: !If [ isRegional, !Ref wafrBlacklistIpSet, !Ref wafgBlacklistIpSet ]
+
+

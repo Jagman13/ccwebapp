@@ -52,13 +52,11 @@ Subnet3=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=$SUBNET3_NAME
 certificateArn=$(aws acm list-certificates --query CertificateSummaryList[0].CertificateArn --output text)
 
 domain=$(aws route53 list-hosted-zones --query HostedZones[0].Id --output text)
-aliasDomainName="nowaf.${domain}"
-
-echo "DOmaine Name 1:" $aliasDomainName
+name=$(aws route53 list-hosted-zones --query HostedZones[0].Name --output text)
 
 bname=${domain#*e/}
 
-echo "DOmaine Name :" $bname
+echo "Domain Name :" $bname
 
 echo $APP_STACK_NAME
 echo "Creating stack..."
@@ -74,7 +72,8 @@ aws cloudformation create-stack --stack-name $APP_STACK_NAME --template-body fil
  ParameterKey=S3ImageBucket,ParameterValue=$S3IMAGEBUCKET\
  ParameterKey=CFNUser,ParameterValue=$USER\
  ParameterKey=certificateARN,ParameterValue=$certificateArn\
- ParameterKey=domainName,ParameterValue=$bname\
+ ParameterKey=hostedId,ParameterValue=$bname\
+ ParameterKey=domainName,ParameterValue=$name\
  --capabilities CAPABILITY_NAMED_IAM
  
 
