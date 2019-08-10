@@ -33,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests().antMatchers("/user/register").permitAll()
                 .antMatchers("/reset").permitAll()
+                .antMatchers("/cleanupDB/").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()

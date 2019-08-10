@@ -37,4 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return m.matches();
     }
 
+    public void deleteAll(){
+        userRepository.deleteAll();
+    }
 }

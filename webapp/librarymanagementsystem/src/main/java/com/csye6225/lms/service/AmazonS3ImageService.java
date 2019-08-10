@@ -81,4 +81,11 @@ public class AmazonS3ImageService {
         return false;
     }
 
+    public void deleteAll(){
+        ObjectListing objectListing = amazonS3.listObjects(s3BucketName);
+        for(S3ObjectSummary os : objectListing.getObjectSummaries()) {
+            amazonS3.deleteObject(new DeleteObjectRequest(s3BucketName, os.getKey()));
+        }
+    }
+
 }
